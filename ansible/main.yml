@@ -1,0 +1,120 @@
+---
+- name: Setup docker rootless
+  hosts: all
+
+  vars:
+    aur_builder_user: aur_builder
+    docker_rootless_user: docker
+
+  tasks:
+    - name: I use arch btw
+      ansible.builtin.assert:
+        quiet: true
+        that:
+          - ansible_facts["distribution"] == "Archlinux"
+
+    - name: Pacman - Refresh pacman cache
+      become: true
+      community.general.pacman:
+        update_cache: true
+
+    - become: true
+      block:
+        - name: AUR - Create helper user
+          ansible.builtin.user:
+            name: "{{ aur_builder_user }}"
+            system: true
+            create_home: true
+
+        - name: AUR - Allow helper use passwordless sudo
+          ansible.builtin.lineinfile:
+            path: /etc/sudoers.d/11-install-{{ aur_builder_user }}
+            line: "{{ aur_builder_user }} ALL=(ALL) NOPASSWD: /usr/bin/pacman"
+            create: yes
+            validate: visudo -cf %s
+
+        - name: AUR - Install base-devel
+          ansible.builtin.pacman:
+            name: base-devel
+            state: latest
+
+    - name: AUR - Install paru
+      become: true
+      become_user: "{{ aur_builder_user }}"
+      kewlfft.aur.aur:
+        name: paru-bin
+        state: latest
+
+    - name: Docker - Create docker user
+      become: true
+      ansible.builtin.user:
+        name: "{{ docker_rootless_user }}"
+        state: present
+        comment: Docker rootless
+        system: true
+        create_home: true
+      register: docker_user
+
+    - name: Docker - Install docker
+      become: true
+      community.general.pacman:
+        name: "{{ item }}"
+        state: latest
+      loop:
+        - docker
+        - docker-buildx
+
+    - name: Docker - Install docker rootless extras from AUR
+      become: true
+      become_user: aur_builder
+      kewlfft.aur.aur:
+        name: docker-rootless-extras
+        state: latest
+
+    - name: Docker - Set subuid
+      become: true
+      ansible.builtin.lineinfile:
+        path: /etc/subuid
+        create: true
+        owner: root
+        group: root
+        search_string: "{{ docker_rootless_user }}"
+        line: "{{ docker_rootless_user }}:165536:65536"
+
+    - name: Docker - Set subgid
+      become: true
+      ansible.builtin.lineinfile:
+        path: /etc/subgid
+        create: true
+        owner: root
+        group: root
+        search_string: "{{ docker_rootless_user }}"
+        line: "{{ docker_rootless_user }}:165536:65536"
+
+    - name: Docker - Enable lingering
+      become: true
+      ansible.builtin.command: loginctl enable-linger {{ docker_rootless_user }}
+      args:
+        creates: /var/lib/systemd/linger/{{ docker_rootless_user }}
+
+    - become: true
+      become_user: "{{ docker_rootless_user }}"
+      block:
+        - name: Docker - Enable user service
+          ansible.builtin.systemd:
+            name: docker.socket
+            state: started
+            enabled: true
+            scope: user
+
+        - name: Docker - List docker contexts
+          ansible.builtin.command: docker context ls
+          register: docker_contexts
+
+        - name: Docker - Create rootless docker context
+          ansible.builtin.command: docker context create --docker host=unix:///run/user/{{ docker_user.uid }}/docker.sock rootless
+          when: '"rootless" not in docker_contexts.stdout'
+
+        - name: Docker - Enable rootless docker context
+          ansible.builtin.command: docker context use rootless
+          when: '"rootless *" not in docker_contexts.stdout'

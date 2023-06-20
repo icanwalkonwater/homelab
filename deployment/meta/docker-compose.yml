@@ -1,0 +1,18 @@
+---
+version: '3.8'
+
+services:
+
+  # === Docker registry
+
+  registry:
+    image: registry:2.8.2
+    restart: unless-stopped
+    # ports:
+    #   - 5000:5000
+    networks:
+      - web
+
+networks:
+  web:
+    name: web-meta

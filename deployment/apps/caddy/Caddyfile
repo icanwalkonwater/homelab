@@ -1,0 +1,72 @@
+{
+	# acme_ca "https://acme-staging-v02.api.letsencrypt.org/directory"
+}
+
+(compress) {
+	encode zstd gzip
+}
+
+(forward_auth_to_authelia) {
+	forward_auth auth-authelia:9091 {
+		uri /api/verify?rd=https://auth.homelab.icanwalkonwater.dev/
+		copy_headers {
+			Remote-User>X-Webauth-Users
+			Remote-Name>X-Webauth-Name
+			Remote-Email>X-Webauth-Email
+			Remote-Groups>X-Webauth-Groups
+		}
+	}
+}
+
+(forward_basic_to_authelia) {
+	forward_auth auth-authelia:9091 {
+		uri /api/verify
+		header_up +Proxy-Authorization {header.Authorization}
+	}
+}
+
+localhost, homelab.icanwalkonwater.dev {
+	import compress
+
+	import forward_auth_to_authelia
+	respond "TODO: Homelab portal"
+}
+
+auth.homelab.icanwalkonwater.dev {
+	import compress
+	reverse_proxy auth-authelia:9091
+}
+
+lldap.homelab.icanwalkonwater.dev {
+	import compress
+
+	import forward_auth_to_authelia
+	reverse_proxy auth-lldap:17170
+}
+
+grafana.homelab.icanwalkonwater.dev {
+	import compress
+
+	import forward_auth_to_authelia
+	reverse_proxy analytics-grafana:3000
+}
+
+octoprint.homelab.icanwalkonwater.dev {
+	import compress
+
+	import forward_auth_to_authelia
+	reverse_proxy octoprint:5000
+}
+
+registry.homelab.icanwalkonwater.dev {
+	import compress
+
+	import forward_basic_to_authelia
+
+	reverse_proxy /v2/* registry:5000 {
+		header_up Docker-Distribution-API-Version "registry/2.0"
+		header_up X-Forwarded-Proto {scheme}
+		header_up X-Forwarded-For {remote}
+		header_up Host {host}
+	}
+}

@@ -1,0 +1,108 @@
+---
+theme: dark
+default_redirection_url: https://homelab.icanwalkonwater.dev/
+default_2fa_method: "totp"
+
+server:
+  port: 9091
+
+log:
+  level: debug
+  format: text
+  file_path: /config/authelia.%d.log
+  keep_stdout: true
+
+ntp:
+  address: "time.cloudflare.com:123"
+  version: 4
+  max_desync: 3s
+  disable_startup_check: false
+  disable_failure: false
+
+telemetry:
+  metrics:
+    enabled: true
+    address: tcp://0.0.0.0:9959
+
+totp:
+  disable: false
+  issuer: homelab.icanwalkonwater.dev
+  algorithm: sha1
+  digits: 6
+  period: 30
+  skew: 0
+  secret_size: 64
+
+webauthn:
+  disable: true
+
+duo_api:
+  disable: true
+
+authentication_backend:
+  password_reset:
+    disable: false
+
+  refresh_interval: 5m
+  ldap:
+    implementation: custom
+    url: ldap://auth-lldap:3890
+    timeout: 5s
+    start_tls: false
+    base_dn: dc=homelab,dc=icanwalkonwater,dc=dev
+
+    username_attribute: uid
+    display_name_attribute: displayName
+    mail_attribute: mail
+    group_name_attribute: cn
+    additional_users_dn: ou=people
+    additional_groups_dn: ou=groups
+
+    users_filter: (&({username_attribute}={input})(objectClass=person))
+    groups_filter: (member={dn})
+
+    user: uid=authelia,ou=people,dc=homelab,dc=icanwalkonwater,dc=dev
+    password: password
+
+password_policy:
+  standard:
+    enabled: false
+  zxcvbn:
+    enabled: true
+    min_score: 3
+
+access_control:
+  default_policy: deny
+  rules:
+    - domain: homelab.icanwalkonwater.dev
+      policy: one_factor
+    - domain: lldap.homelab.icanwalkonwater.dev
+      policy: one_factor
+    - domain: grafana.homelab.icanwalkonwater.dev
+      policy: one_factor
+    - domain: octoprint.homelab.icanwalkonwater.dev
+      policy: one_factor
+    - domain: registry.homelab.icanwalkonwater.dev
+      policy: one_factor
+
+session:
+  name: authelia_session
+  domain: homelab.icanwalkonwater.dev
+  same_site: lax
+  expiration: 1h
+  inactivity: 5m
+  remember_me_duration: 1M
+
+regulation:
+  max_retries: 3
+  find_time: 2m
+  ban_time: 5m
+
+storage:
+  local:
+    path: /config/db.sqlite3
+
+notifier:
+  disable_startup_check: false
+  filesystem:
+    filename: /config/notification.txt

@@ -1,0 +1,12 @@
+apiVersion: 1
+
+# See https://grafana.com/docs/grafana/latest/administration/provisioning/#dashboards
+providers:
+  - name: localFile
+    type: file
+    disableDeletion: true
+    updateIntervalSeconds: 99999
+    allowUiUpdates: false
+    options:
+      path: ${GF_PATHS_PROVISIONING}/dashboards
+      foldersFromFilesStructure: true

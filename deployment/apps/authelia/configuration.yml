@@ -7,7 +7,7 @@ server:
   port: 9091
 
 log:
-  level: debug
+  level: info
   format: text
   file_path: /config/authelia.%d.log
   keep_stdout: true
@@ -61,8 +61,8 @@ authentication_backend:
     users_filter: (&({username_attribute}={input})(objectClass=person))
     groups_filter: (member={dn})
 
-    user: uid=authelia,ou=people,dc=homelab,dc=icanwalkonwater,dc=dev
-    password: password
+    user: uid=admin,ou=people,dc=homelab,dc=icanwalkonwater,dc=dev
+    password: a_very_long_admin_password_because_its_cool
 
 password_policy:
   standard:
@@ -99,8 +99,10 @@ regulation:
   ban_time: 5m
 
 storage:
-  local:
-    path: /config/db.sqlite3
+  postgres:
+    host: db-postgres
+    database: authelia
+    username: authelia
 
 notifier:
   disable_startup_check: false

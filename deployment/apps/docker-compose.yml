@@ -26,6 +26,31 @@ services:
       - web-internal
       - web-meta
 
+  # === Databases
+  # Postgres
+
+  db-postgres:
+    image: postgres:15.3-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: yay
+      PGDATA: /var/lib/postgresql/data
+      X_GRAFANA_PASSWORD_FILE: /run/secrets/postgres_grafana_password
+      X_LLDAP_PASSWORD_FILE: /run/secrets/postgres_lldap_password
+      X_AUTHELIA_PASSWORD_FILE: /run/secrets/postgres_authelia_password
+    secrets:
+      - postgres_grafana_password
+      - postgres_lldap_password
+      - postgres_authelia_password
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./postgres/create-grafana-user.sh:/docker-entrypoint-initdb.d/create-grafana-user.sh:ro
+      - ./postgres/create-lldap-user.sh:/docker-entrypoint-initdb.d/create-lldap-user.sh:ro
+      - ./postgres/create-authelia-user.sh:/docker-entrypoint-initdb.d/create-authelia-user.sh:ro
+    networks:
+      - db
+
   # === Analytics
   # - Grafana
   # - Prometheus
@@ -36,21 +61,26 @@ services:
     image: grafana/grafana-oss:10.0.0
     restart: unless-stopped
     depends_on:
+      - db-postgres
       - analytics-prometheus
     environment:
       GF_SERVER_ROOT_URL: https://grafana.homelab.icanwalkonwater.dev
       GF_DEFAULT_INSTANCE_NAME: lucaslab
-      # TODO: postgres
-      # GF_DATABASE_TYPE: postgres
+      GF_DATABASE_TYPE: postgres
+      GF_DATABASE_HOST: db-postgres
+      GF_DATABASE_NAME: grafana
+      GF_DATABASE_USER: grafana
+      GF_DATABASE_PASSWORD__FILE: /run/secrets/postgres_grafana_password
       GF_ANALYTICS_REPORTING_ENABLED: false
       GF_ANALYTICS_CHECK_FOR_UPDATES: false
       GF_ANALYTICS_CHECK_FOR_PLUGIN_UPDATES: false
-      GF_SECURITY_DISABLE_INITIAL_ADMIN_CREATION: true
+      GF_SECURITY_DISABLE_INITIAL_ADMIN_CREATION: false
       GF_SECURITY_DISABLE_GRAVATAR: true
       GF_SECURITY_COOKIE_SECURE: true
       GF_SECURITY_STRICT_TRANSPORT_SECURITY: true
       GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /etc/grafana/provisioning/dashboards/general.json
-      GF_ALTERTING_ENABLE: false
+      GF_ALTERTING_ENABLED: false
+      GF_UNIFIED_ALERTING_ENABLED: false
       GF_AUTH_DISABLE_LOGIN_FORM: true
       GF_AUTH_SIGNOUT_REDIRECT_URL: https://auth.homelab.icanwalkonwater.dev/logout
       GF_AUTH_BASIC_ENABLE: false
@@ -58,13 +88,15 @@ services:
       GF_AUTH_PROXY_HEADER_NAME: X-Webauth-Users
       GF_AUTH_PROXY_AUTO_SIGN_UP: true
       GF_AUTH_PROXY_HEADERS: Name:X-Webauth-Name Email:X-Webauth-Email Groups:X-Webauth-Groups
+    secrets:
+      - postgres_grafana_password
     volumes:
       - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
       - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
       - grafana-data:/var/lib/grafana
     networks:
       - analytics
-      - auth
+      - db
       - web-internal
 
   analytics-prometheus:
@@ -126,17 +158,16 @@ services:
   auth-lldap:
     image: nitnelave/lldap:v0.4.3-alpine
     restart: always
+    depends_on:
+      - db-postgres
     environment:
-      # TODO: set a specific user
-      # UID: xxx
-      # GID: xxx
       TZ: Europe/Paris
       LLDAP_JWT_SECRET_FILE: /run/secrets/lldap_jwt_secret
       LLDAP_LDAP_USER_PASS_FILE: /run/secrets/lldap_admin_pass
       LLDAP_LDAP_BASE_DN: dc=homelab,dc=icanwalkonwater,dc=dev
       LLDAP_SMTP_OPTIONS_ENABLE_PASSWORD_RESET: false
       LLDAP_LDAPS_OPTIONS_ENABLED: false
-      # LLDAP_DATABASE_URL: TODO: use postgres
+      LLDAP_DATABASE_URL: postgres://lldap:lldap@db-postgres/lldap
     secrets:
       - lldap_jwt_secret
       - lldap_admin_pass
@@ -144,28 +175,29 @@ services:
       - lldap-data:/data
     networks:
       - auth
+      - db
       - web-internal
 
   auth-authelia:
     image: authelia/authelia:4.37.5
     restart: always
     depends_on:
+      - db-postgres
       - auth-lldap
     environment:
       AUTHELIA_JWT_SECRET_FILE: /run/secrets/authelia_jwt_secret
       AUTHELIA_SESSION_SECRET_FILE: /run/secrets/authelia_session_secret
-      # AUTHELIA_STORAGE_POSTGRES_PASSWORD_FILE: /run/secrets/authelia_postgres_password
       AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE: /run/secrets/authelia_storage_encryption_secret
-      # AUTHELIA_IDENTITY_PROVIDERS_OIDC_ISSUER_PRIVATE_KEY_FILE: /run/secrets/authelia_oid_private_key
+      AUTHELIA_STORAGE_POSTGRES_PASSWORD_FILE: /run/secrets/postgres_authelia_password
     secrets:
       - authelia_jwt_secret
       - authelia_session_secret
-      - authelia_postgres_password
       - authelia_storage_encryption_secret
-      - authelia_oid_private_key
+      - postgres_authelia_password
     volumes:
       - ./authelia/configuration.yml:/config/configuration.yml:ro
     networks:
+      - db
       - auth
       - web-internal
       - authelia-outside
@@ -188,6 +220,8 @@ services:
 
 volumes:
   caddy-data:
+
+  postgres-data:
 
   grafana-data:
   prometheus-data:
@@ -212,6 +246,9 @@ networks:
   web-meta:
     external: true
 
+  db:
+    internal: true
+
 secrets:
   lldap_jwt_secret:
     file: ./lldap/jwt_secret.txt
@@ -222,9 +259,12 @@ secrets:
     file: ./authelia/jwt_secret.txt
   authelia_session_secret:
     file: ./authelia/session_secret.txt
-  authelia_postgres_password:
-    file: ./authelia/postgres_password.txt
   authelia_storage_encryption_secret:
     file: ./authelia/storage_encryption_secret.txt
-  authelia_oid_private_key:
-    file: ./authelia/oidc/private.pem
+
+  postgres_grafana_password:
+    file: ./grafana/postgres_password.txt
+  postgres_lldap_password:
+    file: ./lldap/postgres_password.txt
+  postgres_authelia_password:
+    file: ./authelia/postgres_password.txt

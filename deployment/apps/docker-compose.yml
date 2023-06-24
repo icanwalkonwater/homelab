@@ -199,10 +199,12 @@ services:
       - auth-lldap
     environment:
       AUTHELIA_JWT_SECRET_FILE: /run/secrets/authelia_jwt
+      AUTHELIA_AUTHENTIFICATION_BACKEND_LDAP_PASSWORD_FILE: /run/secrets/lldap_admin_password
       AUTHELIA_SESSION_SECRET_FILE: /run/secrets/authelia_session
       AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE: /run/secrets/authelia_storage_encryption
       AUTHELIA_STORAGE_POSTGRES_PASSWORD_FILE: /run/secrets/postgres_authelia_password
     secrets:
+      - lldap_admin_password
       - authelia_jwt
       - authelia_session
       - authelia_storage_encryption

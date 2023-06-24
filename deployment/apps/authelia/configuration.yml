@@ -62,7 +62,6 @@ authentication_backend:
     groups_filter: (member={dn})
 
     user: uid=admin,ou=people,dc=homelab,dc=icanwalkonwater,dc=dev
-    password: a_very_long_admin_password_because_its_cool
 
 password_policy:
   standard:

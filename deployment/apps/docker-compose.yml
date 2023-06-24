@@ -31,7 +31,7 @@ services:
 
   db-postgres:
     image: postgres:15.3-alpine
-    restart: always
+    restart: unless-stopped
     environment:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: yay
@@ -39,10 +39,14 @@ services:
       X_GRAFANA_PASSWORD_FILE: /run/secrets/postgres_grafana_password
       X_LLDAP_PASSWORD_FILE: /run/secrets/postgres_lldap_password
       X_AUTHELIA_PASSWORD_FILE: /run/secrets/postgres_authelia_password
+    user: postgres
     secrets:
-      - postgres_grafana_password
-      - postgres_lldap_password
-      - postgres_authelia_password
+      - source: postgres_grafana_password
+        uid: "999"
+      - source: postgres_lldap_password
+        uid: "999"
+      - source: postgres_authelia_password
+        uid: "999"
     volumes:
       - postgres-data:/var/lib/postgresql/data
       - ./postgres/create-grafana-user.sh:/docker-entrypoint-initdb.d/create-grafana-user.sh:ro
@@ -58,7 +62,7 @@ services:
   #   - Cadvisor
 
   analytics-grafana:
-    image: grafana/grafana-oss:10.0.0
+    image: grafana/grafana-oss:10.0.1
     restart: unless-stopped
     depends_on:
       - db-postgres
@@ -88,8 +92,10 @@ services:
       GF_AUTH_PROXY_HEADER_NAME: X-Webauth-Users
       GF_AUTH_PROXY_AUTO_SIGN_UP: true
       GF_AUTH_PROXY_HEADERS: Name:X-Webauth-Name Email:X-Webauth-Email Groups:X-Webauth-Groups
+    user: grafana
     secrets:
-      - postgres_grafana_password
+      - source: postgres_grafana_password
+        uid: "472"
     volumes:
       - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
       - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
@@ -102,6 +108,9 @@ services:
   analytics-prometheus:
     image: prom/prometheus:v2.44.0
     restart: unless-stopped
+    depends_on:
+      - analytics-exporter-node
+      - analytics-exporter-cadvisor
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus-data:/prometheus
@@ -161,16 +170,20 @@ services:
     depends_on:
       - db-postgres
     environment:
+      UID: 1000
+      GID: 1000
       TZ: Europe/Paris
-      LLDAP_JWT_SECRET_FILE: /run/secrets/lldap_jwt_secret
-      LLDAP_LDAP_USER_PASS_FILE: /run/secrets/lldap_admin_pass
+      LLDAP_JWT_SECRET_FILE: /run/secrets/lldap_jwt
+      LLDAP_LDAP_USER_PASS_FILE: /run/secrets/lldap_admin_password
       LLDAP_LDAP_BASE_DN: dc=homelab,dc=icanwalkonwater,dc=dev
       LLDAP_SMTP_OPTIONS_ENABLE_PASSWORD_RESET: false
       LLDAP_LDAPS_OPTIONS_ENABLED: false
-      LLDAP_DATABASE_URL: postgres://lldap:lldap@db-postgres/lldap
+      LLDAP_DATABASE_URL: postgres://lldap:${POSTGRES_LLDAP_PASSWORD}@db-postgres/lldap
     secrets:
-      - lldap_jwt_secret
-      - lldap_admin_pass
+      - source: lldap_jwt
+        uid: "1000"
+      - source: lldap_admin_password
+        uid: "1000"
     volumes:
       - lldap-data:/data
     networks:
@@ -185,14 +198,14 @@ services:
       - db-postgres
       - auth-lldap
     environment:
-      AUTHELIA_JWT_SECRET_FILE: /run/secrets/authelia_jwt_secret
-      AUTHELIA_SESSION_SECRET_FILE: /run/secrets/authelia_session_secret
-      AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE: /run/secrets/authelia_storage_encryption_secret
+      AUTHELIA_JWT_SECRET_FILE: /run/secrets/authelia_jwt
+      AUTHELIA_SESSION_SECRET_FILE: /run/secrets/authelia_session
+      AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE: /run/secrets/authelia_storage_encryption
       AUTHELIA_STORAGE_POSTGRES_PASSWORD_FILE: /run/secrets/postgres_authelia_password
     secrets:
-      - authelia_jwt_secret
-      - authelia_session_secret
-      - authelia_storage_encryption_secret
+      - authelia_jwt
+      - authelia_session
+      - authelia_storage_encryption
       - postgres_authelia_password
     volumes:
       - ./authelia/configuration.yml:/config/configuration.yml:ro
@@ -201,7 +214,6 @@ services:
       - auth
       - web-internal
       - authelia-outside
-
   # === Octoprint
   # Stopped by default
 
@@ -250,21 +262,11 @@ networks:
     internal: true
 
 secrets:
-  lldap_jwt_secret:
-    file: ./lldap/jwt_secret.txt
-  lldap_admin_pass:
-    file: ./lldap/admin_pass.txt
-
-  authelia_jwt_secret:
-    file: ./authelia/jwt_secret.txt
-  authelia_session_secret:
-    file: ./authelia/session_secret.txt
-  authelia_storage_encryption_secret:
-    file: ./authelia/storage_encryption_secret.txt
-
-  postgres_grafana_password:
-    file: ./grafana/postgres_password.txt
-  postgres_lldap_password:
-    file: ./lldap/postgres_password.txt
-  postgres_authelia_password:
-    file: ./authelia/postgres_password.txt
+  lldap_jwt: { environment: LLDAP_JWT_SECRET }
+  lldap_admin_password: { environment: LLDA_ADMIN_PASS_SECRET }
+  authelia_jwt: { environment: AUTHELIA_JWT_SECRET }
+  authelia_session: { environment: AUTHELIA_SESSION_SECRET }
+  authelia_storage_encryption: { environment: AUTHELIA_STORAGE_ENCRYPTION_SECRET }
+  postgres_grafana_password: { environment: POSTGRES_GRAFANA_PASSWORD }
+  postgres_lldap_password: { environment: POSTGRES_LLDAP_PASSWORD }
+  postgres_authelia_password: { environment: POSTGRES_AUTHELIA_PASSWORD }

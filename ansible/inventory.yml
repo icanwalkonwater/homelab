@@ -1,8 +1,0 @@
----
-all:
-  hosts:
-    lucasfilm:
-      ansible_host: lucasfilm
-    lucaspc:
-      ansible_host: localhost
-      ansible_connect: local

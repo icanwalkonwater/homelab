@@ -1,0 +1,12 @@
+---
+all:
+  children:
+    arch_servers:
+      hosts:
+        lucasfilm:
+          ansible_host: lucasfilm
+    arch_desktops:
+      hosts:
+        lucaspc:
+          ansible_host: localhost
+          ansible_connect: local

@@ -1,0 +1,11 @@
+--- archlive/grub/grub.cfg.orig	2023-06-25 15:51:55.729991169 +0200
++++ archlive/grub/grub.cfg	2023-06-25 15:52:04.660493370 +0200
+@@ -34,7 +34,7 @@
+ 
+ # Set default menu entry
+ default=archlinux
+-timeout=15
++timeout=0
+ timeout_style=menu
+ 
+ # GRUB init tune for accessibility

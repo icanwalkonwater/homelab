@@ -13,13 +13,18 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v4
         with:
-          cache: pip
           python-version: '3.11'
-      - name: Install ansible
+          cache: pip
+      - name: Install requirements
         run: |
-          pip install ansible
-      - name: Run ansible-lint
+          pip install -r requirements.txt
+      - name: Lint baremetal playbooks
         uses: ansible/ansible-lint@v6.20.3
         with:
           setup_python: false
           working_directory: ./0_baremetal
+      - name: Lint OS playbooks
+        uses: ansible/ansible-lint@v6.20.3
+        with:
+          setup_python: false
+          working_directory: ./1_os

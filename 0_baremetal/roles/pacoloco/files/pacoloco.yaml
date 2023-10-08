@@ -10,4 +10,3 @@ repos:
       - http://archlinux.mirrors.ovh.net/archlinux/$repo/os/$arch
       - http://mirror.archlinux.ikoula.com/archlinux/$repo/os/$arch
       - http://mirrors.gandi.net/archlinux/$repo/os/$arch
-

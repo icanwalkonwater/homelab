@@ -6,7 +6,7 @@
 
   tasks:
     - name: Send WoL packet
-      ansible.builtin.wakeonlan:
+      community.general.wakeonlan:
         mac: '{{ mac }}'
       delegate_to: localhost
 
@@ -41,4 +41,3 @@
     #           - name: '@media/@storage'
     #           - name: '@minecraft'
     #           - name: '@minecraft/@snapshots'
-

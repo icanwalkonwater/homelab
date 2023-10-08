@@ -6,7 +6,7 @@
 - name: Install paru
   when: '"paru" not in ansible_facts["packages"]'
   block:
-    - name: Clone paru AUR package
+    - name: Clone paru AUR package # noqa: latest[git]
       ansible.builtin.git:
         repo: https://aur.archlinux.org/paru.git
         dest: /tmp/paru
@@ -25,7 +25,7 @@
   register: paru_output
   changed_when: '"there is nothing to do" not in paru_output.stdout'
 
-- name: Print updates packages
+- name: Print updates packages # noqa: no-handler
   when: paru_output.changed
   ansible.builtin.debug:
     msg: '{{ paru_output.stdout_lines }}'

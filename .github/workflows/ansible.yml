@@ -23,14 +23,8 @@ jobs:
         run: |
           pip install -r requirements.txt
 
-      - name: Run ansible-lint on 0-baremetal
+      - name: Run ansible-lint
         uses: ansible/ansible-lint@v6.20.3
         with:
-          setup_python: false
-          working_directory: ./0-baremetal
-
-      - name: Run ansible-lint on 1-os
-        uses: ansible/ansible-lint@v6.20.3
-        with:
-          setup_python: false
-          working_directory: ./1-os
+          setup_python: true
+          args: ./0-baremetal ./1-os

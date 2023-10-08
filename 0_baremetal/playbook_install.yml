@@ -1,0 +1,48 @@
+# vim: ft=yaml.ansible
+---
+- name: Start local package cache proxy
+  gather_facts: false
+  hosts: localhost
+
+  roles:
+    - role: pacoloco
+      vars:
+        pacoloco_enabled: true
+
+- name: Generate a temporary SSH key for the install
+  gather_facts: false
+  hosts: localhost
+
+  tasks:
+    - name: Generate keypair
+      community.crypto.openssh_keypair:
+        path: '{{ playbook_dir }}/service_account.key'
+        size: 384
+        type: ecdsa
+        # mode: '0400'
+
+- name: Install Archlinux
+  hosts: nodes
+
+  roles:
+    - role: archlinux_setup
+      vars:
+        archlinux_setup_disk_boot: '{{ disks["boot"] }}'
+        archlinux_setup_pacman_proxy:
+          enabled: true
+          mirror: http://192.168.1.65:9129/repo/archlinux/$repo/os/$arch
+        archlinux_setup_ansible_account_ssh_authorized_key: '{{ lookup("file", playbook_dir + "/service_account.key.pub") }}'
+
+  tasks:
+    - name: Shutdown node
+      become: true
+      community.general.shutdown:
+
+- name: Stop local package cache proxy
+  gather_facts: false
+  hosts: localhost
+
+  roles:
+    - role: pacoloco
+      vars:
+        pacoloco_enabled: false

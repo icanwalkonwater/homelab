@@ -1,0 +1,14 @@
+# vim: ft=yaml.ansible
+---
+- name: Enable automatic scrub
+  ansible.builtin.systemd_service:
+    name: 'btrfs-scrub@-.timer'
+    state: started
+    enabled: true
+
+- name: Cleanup fstab
+  ansible.builtin.replace:
+    path: /etc/fstab
+    regexp: 'subvolid=[0-9]+,'
+    replace: ''
+    backup: true

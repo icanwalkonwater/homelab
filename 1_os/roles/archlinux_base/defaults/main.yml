@@ -1,0 +1,24 @@
+# vim: ft=yaml.ansible
+---
+archlinux_base_updates_download_period: 'Tue *-*-* 5:00:00 Europe/Paris'
+archlinux_base_update_mirrors_period: '*-*-1 5:00:00 Europe/Paris'
+archlinux_base_needed_packages:
+  - base
+  - linux-hardened
+  - linux-firmware
+  - grub
+  - efibootmgr
+  - intel-ucode
+  - btrfs-progs
+  # Pacman related
+  - reflector
+  - pacman-contrib
+  # Time
+  - ntp
+  # Ansible
+  - openssh
+  - python
+  # Snapshots
+  - btrbk
+  # AUR Helper
+  - git

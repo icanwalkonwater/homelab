@@ -1,0 +1,77 @@
+# vim: ft=yaml.ansible
+---
+- name: Ensure needed packages are installed
+  ansible.builtin.package:
+    name: '{{ archlinux_base_needed_packages }}'
+    state: present # don't update just yet
+
+# Reflector config
+- name: Set reflector config
+  ansible.builtin.copy:
+    src: '{{ role_path }}/files/reflector.conf'
+    dest: /etc/xdg/reflector/reflector.conf
+    mode: '0644'
+
+- name: Create reflector override folder
+  ansible.builtin.file:
+    path: /etc/systemd/system/reflector.timer.d
+    state: directory
+    mode: '0644'
+
+- name: Override reflector default timer period
+  ansible.builtin.template:
+    src: '{{ role_path }}/templates/reflector-override-period.conf.j2'
+    dest: /etc/systemd/system/reflector.timer.d/00-period.conf
+    mode: '0644'
+
+- name: Enable reflector (automatic mirror update)
+  ansible.builtin.systemd_service:
+    name: reflector.timer
+    state: started
+    enabled: true
+    daemon_reload: true
+
+# Pacman config
+- name: Install automatic update download service
+  ansible.builtin.copy:
+    src: '{{ role_path }}/files/pacman-download-updates.service'
+    dest: /etc/systemd/system/pacman-download-updates.service
+    mode: '0644'
+
+- name: Install automatic update download timer
+  ansible.builtin.template:
+    src: '{{ role_path }}/templates/pacman-download-updates.timer.j2'
+    dest: /etc/systemd/system/pacman-download-updates.timer
+    mode: '0644'
+
+- name: Enable automatic update download
+  ansible.builtin.systemd_service:
+    name: pacman-download-updates.timer
+    state: started
+    enabled: true
+    daemon_reload: true
+
+- name: Enable automatic package cache cleanup
+  ansible.builtin.systemd_service:
+    name: paccache.timer
+    state: started
+    enabled: true
+
+# Upgrade the system
+- name: Update everyting
+  community.general.pacman:
+    update_cache: true
+    upgrade: true
+  register: updated_pkgs
+
+- name: Update grub if needed
+  when: 'updated_pkgs.changed and "packages" in updated_pkgs and "grub" in updated_pkgs.packages'
+  block:
+    - name: Update grub installation
+      ansible.builtin.command:
+        cmd: grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB --removable
+        creates: # nothing
+    - name: Update grub config
+      ansible.builtin.command:
+        cmd: grub-mkconfig -o /boot/grub/grub.cfg
+        creates: # nothing

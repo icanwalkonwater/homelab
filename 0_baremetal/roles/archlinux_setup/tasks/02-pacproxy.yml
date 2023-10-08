@@ -1,0 +1,18 @@
+# vim: ft=yaml.ansible
+---
+- name: Check that a proxy mirror has been provided
+  ansible.builtin.assert:
+    fail_msg: 'You enabled the pacman cache proxy without specifying a mirror URL !'
+    that:
+      - archlinux_setup_pacman_proxy['mirror'] != None
+    quiet: true
+
+- name: Override pacman mirrorlist to only point to the mirror
+  become: true
+  ansible.builtin.copy:
+    content: |-
+      # Overridden to use a cache proxy
+      Server = {{ archlinux_setup_pacman_proxy.mirror }}
+    dest: /etc/pacman.d/mirrorlist
+    mode: '0400'
+    backup: true

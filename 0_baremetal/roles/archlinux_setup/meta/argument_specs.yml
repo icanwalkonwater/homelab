@@ -1,0 +1,57 @@
+# vim: ft=yaml.ansible
+---
+argument_specs:
+  main:
+    options:
+      archlinux_setup_disk_boot:
+        type: path
+        required: true
+        description: "What disk to format as a boot disk"
+
+      archlinux_setup_partlabels:
+        type: dict
+        required: true
+        description: "How to name the partition, be sure they are unique because the role make heavy use of these names"
+        options:
+          boot:
+            type: str
+            required: true
+          root:
+            type: str
+            required: true
+
+      archlinux_setup_subvolumes:
+        type: list
+        required: true
+        elements: dict
+        options:
+          name:
+            type: str
+            required: true
+            description: "Name of the subvolume, usually starts with @"
+          path:
+            type: path
+            required: true
+            description: "Mount path for this subvolume"
+
+      archlinux_setup_pacman_proxy:
+        type: dict
+        required: true
+        options:
+          enabled:
+            type: bool
+            required: true
+            description: "Whether or not to enable this feature"
+          mirror:
+            type: str
+            required: false
+            description: "What URL to put in the mirrorlist after `Server = `"
+
+      archlinux_setup_additional_packages:
+        type: list
+        required: true
+        elements: str
+
+      archlinux_setup_ansible_account_ssh_authorized_key:
+        type: str
+        required: true

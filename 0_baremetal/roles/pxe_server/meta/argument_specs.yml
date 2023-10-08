@@ -1,0 +1,14 @@
+# vim: ft=yaml.ansible
+---
+argument_specs:
+  main:
+    options:
+      pxe_server_enabled:
+        type: bool
+        required: true
+      pxe_server_compose_name:
+        type: str
+        required: true
+      pxe_server_ssh_authorized_key:
+        type: 'str'
+        required: true

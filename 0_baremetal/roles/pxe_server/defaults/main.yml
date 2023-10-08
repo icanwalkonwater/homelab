@@ -1,0 +1,4 @@
+# vim: ft=yaml.ansible
+---
+pxe_server_compose_name: pxe_server
+pxe_server_ssh_authorized_key: ''

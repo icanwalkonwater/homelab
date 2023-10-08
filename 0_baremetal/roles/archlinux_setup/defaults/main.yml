@@ -1,0 +1,28 @@
+# vim: ft=yaml.ansible
+---
+archlinux_setup_partlabels:
+  boot: lucasmetal-boot
+  root: lucasmetal-root
+
+archlinux_setup_subvolumes:
+  - name: '@'
+    path: /
+  - name: '@home'
+    path: /home
+  - name: '@log'
+    path: /var/log
+  - name: '@cache'
+    path: /var/cache
+  - name: '@pkg'
+    path: /var/cache/pacman/pkg
+  - name: '@snapshots'
+    path: /.snapshots
+
+archlinux_setup_pacman_proxy:
+  enabled: false
+
+archlinux_setup_additional_packages:
+  - intel-ucode
+  - reflector
+  - python
+  - neovim

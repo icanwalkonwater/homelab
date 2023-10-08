@@ -1,0 +1,51 @@
+# vim: ft=yaml.ansible
+---
+# *** Preliminary checks
+- name: Check distro
+  ansible.builtin.assert:
+    quiet: true
+    that:
+      - ansible_facts['distribution'] == 'Archlinux'
+      - ansible_facts['hostname'] == inventory_hostname
+      - ansible_facts['architecture'] == 'x86_64'
+
+- name: Check that we are booted in UEFI 64bits
+  ansible.builtin.lineinfile:
+    name: /sys/firmware/efi/fw_platform_size
+    line: '64'
+    state: present
+  check_mode: true
+  register: is_efi64
+  failed_when: is_efi64.changed
+
+# *** Actual stuff
+- name: Update system
+  become: true
+  ansible.builtin.import_tasks:
+    file: 10-updates.yml
+
+- name: Update AUR packages
+  ansible.builtin.import_tasks:
+    file: 11-aur.yml
+
+- name: Filesystem maintenance
+  become: true
+  ansible.builtin.import_tasks:
+    file: 20-filesystem.yml
+
+- name: Auto snapshotting
+  become: true
+  ansible.builtin.import_tasks:
+    file: 30-snapshots.yml
+
+- name: Ensure time is automatically synced
+  become: true
+  ansible.builtin.service:
+    name: ntpd
+    state: started
+    enabled: true
+
+- name: Ensure service account is correctly configured and reachable
+  become: true
+  ansible.builtin.import_tasks:
+    file: 40-service-account.yml

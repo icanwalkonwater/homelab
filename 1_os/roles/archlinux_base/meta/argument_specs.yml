@@ -1,0 +1,18 @@
+# vim: ft=yaml.ansible
+---
+argument_specs:
+  main:
+    options:
+      archlinux_base_svc_account_authorized_key:
+        type: str
+        required: true
+      archlinux_base_updates_download_period:
+        type: str
+        required: true
+      archlinux_base_update_mirrors_period:
+        type: str
+        required: true
+      archlinux_base_root_dev:
+        type: path
+        required: true
+        description: Device containing the root filesystem

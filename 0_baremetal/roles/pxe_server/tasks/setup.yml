@@ -1,0 +1,28 @@
+ # vim: ft=yaml.ansible
+---
+- name: Download ArchLinux ISO
+  ansible.builtin.get_url:
+    url: https://mirrors.edge.kernel.org/archlinux/iso/latest/archlinux-x86_64.iso
+    dest: '{{ role_path }}/files/raw/archlinux.iso'
+    checksum: sha256:https://mirrors.edge.kernel.org/archlinux/iso/latest/sha256sums.txt
+    mode: '0440'
+
+- name: Extract ISO
+  ansible.builtin.command:
+    chdir: '{{ role_path }}/files/static/iso'
+    cmd: bsdtar -xf {{ role_path }}/files/raw/archlinux.iso
+    creates: '{{ role_path }}/files/static/iso/arch/boot/x86_64/initramfs-linux.img'
+
+- name: Generate cloud-init's user-data
+  ansible.builtin.template:
+    src: '{{ role_path }}/templates/user-data.j2'
+    dest: '{{ role_path }}/files/static/cloud-init/user-data'
+    mode: '0440'
+
+- name: Start PXE server
+  ansible.builtin.command:
+    chdir: '{{ role_path }}/files'
+    cmd: docker compose -p {{ pxe_server_compose_name }} up --force-recreate -d
+    creates:
+  environment:
+    HOST_STATIC_FILES: '{{ ansible_default_ipv4.address }}'

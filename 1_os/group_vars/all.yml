@@ -1,0 +1,4 @@
+# vim: ft=yaml.ansible
+---
+ansible_user: ansible
+ansible_ssh_private_key_file: '{{ playbook_dir }}/service_account.key'

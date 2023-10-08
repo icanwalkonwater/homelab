@@ -1,0 +1,8 @@
+[Unit]
+Description=Run btrbk against root fs
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=btrbk run --config /etc/btrbk/btrbk-rootfs-periodic.conf
+

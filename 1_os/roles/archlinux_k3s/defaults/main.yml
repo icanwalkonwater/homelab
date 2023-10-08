@@ -1,0 +1,9 @@
+# vim: ft=yaml.ansible
+---
+archlinux_k3s_subvolumes:
+  - name: '/@k3s/@main'
+    path: '/var/lib/rancher'
+  - name: '/@k3s/@kubelet'
+    path: '/var/lib/kubelet'
+  - name: '/@k3s/@cni'
+    path: '/var/lib/cni'

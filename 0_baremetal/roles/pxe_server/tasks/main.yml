@@ -1,0 +1,14 @@
+# vim: ft=yaml.ansible
+---
+- name: Check if the docker daemon is reachable
+  community.docker.docker_host_info:
+
+- name: Setup PXE server
+  ansible.builtin.import_tasks:
+    file: setup.yml
+  when: pxe_server_enabled
+
+- name: Teardown PXE server
+  ansible.builtin.import_tasks:
+    file: teardown.yml
+  when: not pxe_server_enabled

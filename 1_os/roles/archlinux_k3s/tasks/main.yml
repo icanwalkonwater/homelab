@@ -1,0 +1,67 @@
+# vim: ft=yaml.ansible
+---
+- name: Check distro
+  ansible.builtin.assert:
+    quiet: true
+    that:
+      - ansible_facts['distribution'] == 'Archlinux'
+      - ansible_facts['hostname'] == inventory_hostname
+
+- name: Create btrfs subvolumes for k3s
+  become: true
+  community.general.btrfs_subvolume:
+    filesystem_device: '{{ archlinux_k3s_root_dev }}'
+    name: '{{ item.name }}'
+    state: present
+    recursive: true
+  loop: '{{ archlinux_k3s_subvolumes }}'
+
+- name: Create k3s subvolumes mount points
+  become: true
+  ansible.builtin.file:
+    path: '{{ item.path }}'
+    state: directory
+    mode: '0755'
+  loop: '{{ archlinux_k3s_subvolumes }}'
+
+- name: Mount k3s subvolumes
+  become: true
+  ansible.posix.mount:
+    src: '{{ archlinux_k3s_root_dev }}'
+    path: '{{ item.path }}'
+    fstype: btrfs
+    opts: subvol={{ item.name }}
+    state: mounted
+  loop: '{{ archlinux_k3s_subvolumes }}'
+
+- name: Install kubectl
+  become: true
+  ansible.builtin.package:
+    name: kubectl
+    state: present
+
+- name: Install k3s from the AUR
+  community.general.pacman:
+    executable: paru
+    name: k3s-bin
+    state: latest
+  notify:
+    - Restart k3s
+
+- name: Install k3s config
+  become: true
+  ansible.builtin.template:
+    src: '{{ role_path }}/templates/config.yaml.j2'
+    dest: /etc/rancher/k3s/config.yaml
+    mode: '0600'
+
+- name: Enable k3s server service
+  become: true
+  ansible.builtin.service:
+    name: k3s.service
+    state: started
+    enabled: true
+  # Cool trick
+  register: k3s_service
+  until: k3s_service is succeeded
+  retries: 5

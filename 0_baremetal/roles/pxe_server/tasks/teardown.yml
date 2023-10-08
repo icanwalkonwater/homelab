@@ -1,0 +1,7 @@
+# vim: ft=yaml.ansible
+---
+- name: Stop PXE server
+  ansible.builtin.command:
+    chdir: '{{ role_path }}/files'
+    cmd: docker compose -p {{ pxe_server_compose_name }} down -v
+    creates:

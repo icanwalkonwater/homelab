@@ -1,0 +1,100 @@
+# vim: ft=yaml.ansible
+---
+
+# *** Setup
+
+- name: Check if inside the archiso
+  ansible.builtin.assert:
+    quiet: true
+    that:
+      - ansible_facts['distribution'] == 'Archlinux'
+      - ansible_facts['hostname'] == 'archiso'
+      - ansible_facts['architecture'] == 'x86_64'
+
+- name: Check if on 64-bit UEFI
+  ansible.builtin.lineinfile:
+    name: /sys/firmware/efi/fw_platform_size
+    line: '64'
+    state: present
+  check_mode: true
+  register: is_efi64
+  failed_when: is_efi64.changed
+
+- name: Check internet connectivity
+  ansible.builtin.wait_for:
+    host: archlinux.org
+    port: 443
+
+# *** Partitionning
+
+- name: Setup disks
+  ansible.builtin.import_tasks:
+    file: 01-disk.yml
+
+# *** Installing base packages
+
+- name: Setup package cache proxy
+  ansible.builtin.import_tasks:
+    file: 02-pacproxy.yml
+  when: archlinux_setup_pacman_proxy.enabled
+
+- name: Install keyring and base
+  become: true
+  ansible.builtin.command:
+    cmd: pacstrap -K -M /mnt base
+    creates: # too many things
+
+- name: Install core packages
+  become: true
+  ansible.builtin.command:
+    cmd: pacstrap -M /mnt {{ item }}
+    creates: # complicated
+  loop:
+    - base-devel
+    - linux-hardened
+    - linux-firmware
+
+# *** Mundane tasks like fstab and setting the time
+
+- name: Setup misc things
+  ansible.builtin.import_tasks:
+    file: 03-misc.yml
+
+# *** Install grub
+
+- name: Install bootloader
+  ansible.builtin.import_tasks:
+    file: 04-bootloader.yml
+
+# *** Setup connectivity
+
+- name: Install NetworkManager
+  become: true
+  ansible.builtin.command:
+    cmd: pacstrap -M /mnt networkmanager
+    creates: # nothing
+
+- name: Enable NetworkManager
+  become: true
+  ansible.builtin.command:
+    cmd: arch-chroot /mnt systemctl enable NetworkManager
+    creates: # too lazy to find it
+
+# *** Create a system account for ansible to ssh into and finish the installation / maintenance
+
+- name: Create accounts
+  ansible.builtin.import_tasks:
+    file: 05-user.yml
+
+- name: Setup SSH
+  ansible.builtin.import_tasks:
+    file: 06-ssh.yml
+
+# *** Bonus packages
+
+- name: Install additional packages
+  become: true
+  ansible.builtin.command:
+    cmd: pacstrap -M /mnt {{ item }}
+    creates: # nothing
+  loop: '{{ archlinux_setup_additional_packages }}'

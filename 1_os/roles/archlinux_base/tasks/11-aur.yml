@@ -1,0 +1,31 @@
+# vim: ft=yaml.ansible
+---
+- name: Query installed packages
+  ansible.builtin.package_facts:
+
+- name: Install paru
+  when: '"paru" not in ansible_facts["packages"]'
+  block:
+    - name: Clone paru AUR package
+      ansible.builtin.git:
+        repo: https://aur.archlinux.org/paru.git
+        dest: /tmp/paru
+        clone: true
+        update: true
+
+    - name: Compile and create paru package
+      ansible.builtin.command:
+        chdir: /tmp/paru
+        cmd: makepkg -si --noconfirm
+        creates: # too complicated
+
+- name: Update AUR packages
+  ansible.builtin.command:
+    cmd: paru -Syu --aur --noconfirm
+  register: paru_output
+  changed_when: '"there is nothing to do" not in paru_output.stdout'
+
+- name: Print updates packages
+  when: paru_output.changed
+  ansible.builtin.debug:
+    msg: '{{ paru_output.stdout_lines }}'

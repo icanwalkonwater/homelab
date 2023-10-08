@@ -1,0 +1,36 @@
+# vim: ft=yaml.ansible
+---
+- name: Create /mnt/rootfs
+  ansible.builtin.file:
+    path: /mnt/rootfs
+    state: directory
+    mode: '0755'
+
+- name: Mount the root subvolume to /mnt/rootfs for convenience
+  ansible.posix.mount:
+    src: '{{ archlinux_base_root_dev }}'
+    path: /mnt/rootfs
+    fstype: btrfs
+    opts: subvolid=5
+    state: mounted
+
+- name: Install btrbk config for periodic snapshots
+  ansible.builtin.copy:
+    src: '{{ role_path }}/files/btrbk-rootfs-periodic.conf'
+    dest: /etc/btrbk/btrbk-rootfs-periodic.conf
+    mode: '0644'
+    validate: btrbk --config %s --verbose --dry-run run
+
+- name: Install btrbk rootfs service and timer
+  ansible.builtin.copy:
+    src: '{{ role_path }}/files/btrbk-rootfs-snapshot.{{ item }}'
+    dest: '/etc/systemd/system/btrbk-rootfs-snapshot.{{ item }}'
+    mode: '0644'
+  loop: [service, timer]
+
+- name: Enable btrbk rootfs timer
+  ansible.builtin.systemd_service:
+    name: btrbk-rootfs-snapshot.timer
+    state: started
+    enabled: true
+    daemon_reload: true

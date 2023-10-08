@@ -1,0 +1,8 @@
+# vim: ft=yaml.ansible
+---
+argument_specs:
+  main:
+    options:
+      pacoloco_enabled:
+        type: bool
+        required: true

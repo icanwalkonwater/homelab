@@ -1,0 +1,9 @@
+# vim: ft=yaml.ansible
+---
+argument_specs:
+  main:
+    options:
+      archlinux_k3s_root_dev:
+        type: path
+        required: true
+        description: Device containing the root filesystem

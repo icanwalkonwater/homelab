@@ -1,0 +1,3 @@
+# vim: ft=yaml.ansible
+---
+archlinux_k3s_root_dev: null

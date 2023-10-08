@@ -1,0 +1,44 @@
+# vim: ft=yaml.ansible
+---
+- name: Wakeup nodes
+  gather_facts: false
+  hosts: nodes
+
+  tasks:
+    - name: Send WoL packet
+      ansible.builtin.wakeonlan:
+        mac: '{{ mac }}'
+      delegate_to: localhost
+
+    - name: Wait for machine to wake up
+      ansible.builtin.wait_for_connection:
+
+- name: Fix/Finalize Archlinux install
+  hosts: nodes
+
+  roles:
+    - role: archlinux_base
+      vars:
+        archlinux_base_svc_account_authorized_key: '{{ lookup("file", playbook_dir + "/service_account.key.pub") }}'
+        archlinux_base_root_dev: /dev/disk/by-id/ata-QEMU_HARDDISK_QM00001-part2
+    - role: archlinux_k3s
+      vars:
+        archlinux_k3s_root_dev: /dev/disk/by-id/ata-QEMU_HARDDISK_QM00001-part2
+
+    # - role: archlinux_storage
+    #   vars:
+    #     archlinux_storage_pools:
+    #       - device: /dev/disk/by-id/ata-ST2000DM001-1ER164_Z501ER3V
+    #         profile:
+    #           metadata: dup
+    #           data: raid1
+    #         subvolumes:
+    #           - name: '@media'
+    #           - name: '@media/@staging'
+    #             snapshots:
+    #               max: 5
+    #               every: 1w
+    #           - name: '@media/@storage'
+    #           - name: '@minecraft'
+    #           - name: '@minecraft/@snapshots'
+

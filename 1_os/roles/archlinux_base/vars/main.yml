@@ -1,0 +1,4 @@
+# vim: ft=yaml.ansible
+---
+archlinux_base_svc_account_authorized_key: null
+archlinux_base_root_dev: null

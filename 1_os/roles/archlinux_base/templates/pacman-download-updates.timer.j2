@@ -1,0 +1,11 @@
+[Unit]
+Description=Download pacman updates weekly at night
+
+[Timer]
+Unit=pacman-download-updates.service
+OnCalendar={{ archlinux_base_updates_download_period }}
+RandomizedDelaySec=1h
+
+[Install]
+WantedBy=timers.target
+

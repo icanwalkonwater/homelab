@@ -1,0 +1,7 @@
+# vim: ft=yaml.ansible
+---
+- name: Restart k3s
+  become: true
+  ansible.builtin.service:
+    name: k3s.service
+    state: restarted

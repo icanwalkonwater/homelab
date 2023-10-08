@@ -1,4 +1,6 @@
 # Homelab
+[![Ansible](https://github.com/icanwalkonwater/homelab/actions/workflows/ansible.yml/badge.svg)](https://github.com/icanwalkonwater/homelab/actions/workflows/ansible.yml)
+
 Trying to setup my homelab from bare metal
 
 ## Roadmap

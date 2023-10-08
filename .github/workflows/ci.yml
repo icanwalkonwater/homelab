@@ -18,12 +18,14 @@ jobs:
       - name: Install requirements
         run: |
           pip install -r requirements.txt
-      - name: Lint baremetal playbooks
+
+      - name: Run ansible-lint on 0_baremetal
         uses: ansible/ansible-lint@v6.20.3
         with:
           setup_python: false
           working_directory: ./0_baremetal
-      - name: Lint OS playbooks
+
+      - name: Run ansible-lint on 1_os
         uses: ansible/ansible-lint@v6.20.3
         with:
           setup_python: false

@@ -1,3 +1,4 @@
 # vim: ft=yaml.ansible
 ---
+archlinux_k3s_package: k3s-1.28-bin
 archlinux_k3s_root_dev: null

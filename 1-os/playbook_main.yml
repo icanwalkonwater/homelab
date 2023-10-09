@@ -23,6 +23,7 @@
         archlinux_base_root_dev: /dev/disk/by-id/ata-QEMU_HARDDISK_QM00001-part2
     - role: archlinux_k3s
       vars:
+        archlinux_k3s_package: k3s-1.28-bin
         archlinux_k3s_root_dev: /dev/disk/by-id/ata-QEMU_HARDDISK_QM00001-part2
 
     # - role: archlinux_storage

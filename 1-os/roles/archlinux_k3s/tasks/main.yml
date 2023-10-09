@@ -43,10 +43,12 @@
 - name: Install k3s from the AUR
   community.general.pacman:
     executable: paru
-    name: k3s-bin
+    name: '{{ archlinux_k3s_package }}'
     state: latest
   notify:
     - Restart k3s
+
+# TODO: patch service to call k3s-killall
 
 - name: Install k3s config
   become: true

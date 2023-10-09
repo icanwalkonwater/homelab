@@ -3,7 +3,23 @@
 argument_specs:
   main:
     options:
+      archlinux_k3s_package:
+        type: str
+        required: true
+        description: Package to use for k3s
       archlinux_k3s_root_dev:
         type: path
         required: true
         description: Device containing the root filesystem
+      archlinux_k3s_subvolumes:
+        type: list
+        elements: dict
+        options:
+          name:
+            type: str
+            required: true
+          path:
+            type: path
+            required: true
+        required: true
+        description: List of additional subvolumes and mountpoints to isolate k3s from the rest of the filesystem

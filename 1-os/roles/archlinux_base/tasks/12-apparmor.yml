@@ -1,0 +1,17 @@
+# vim: ft=yaml.ansible
+---
+- name: Enable AppArmor
+  ansible.builtin.service:
+    name: apparmor.service
+    state: started
+    enabled: true
+
+- name: Add AppArmor to kernel command line
+  ansible.builtin.lineinfile:
+    path: /etc/default/grub
+    insertafter: 'GRUB_CMDLINE_LINUX=""'
+    search_string: 'GRUB_CMDLINE_LINUX="${GRUB_CMDLINE_LINUX} lsm=landlock,lockdown,yama,integrity,apparmor,bpf"'
+    line: 'GRUB_CMDLINE_LINUX="${GRUB_CMDLINE_LINUX} lsm=landlock,lockdown,yama,integrity,apparmor,bpf"'
+    backup: true
+  notify:
+    - grub-update

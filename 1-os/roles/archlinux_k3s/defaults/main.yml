@@ -7,3 +7,4 @@ archlinux_k3s_subvolumes:
     path: '/var/lib/kubelet'
   - name: '/@k3s/@cni'
     path: '/var/lib/cni'
+archlinux_k3s_enable_dual_stack_ipv46: false

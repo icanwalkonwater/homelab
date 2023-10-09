@@ -1,13 +1,20 @@
-# vim: ft=yaml
+write-kubeconfig-mode: 0600
+
 cluster-init: true
 secrets-encryption: true
+
+{% if archlinux_k3s_enable_dual_stack_ipv46 %}
 cluster-cidr:
   - 10.42.0.0/16
   - 2001:cafe:42:0::/56
 service-cidr:
   - 10.43.0.0/16
   - 2001:cafe:42:1::/112
+# Hack to make dual stack work
+kubelet-args: 'node-ip=::'
+{% endif %}
 flannel-backend: wireguard-native
 
 disable-cloud-controller: true
-
+disable:
+  - traefik

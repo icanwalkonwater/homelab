@@ -1,0 +1,25 @@
+# vim: ft=yaml.ansible
+---
+- name: Create btrfs subvolumes for k3s
+  community.general.btrfs_subvolume:
+    filesystem_device: '{{ archlinux_k3s_root_dev }}'
+    name: '{{ item.name }}'
+    state: present
+    recursive: true
+  loop: '{{ archlinux_k3s_subvolumes }}'
+
+- name: Create k3s subvolumes mount points
+  ansible.builtin.file:
+    path: '{{ item.path }}'
+    state: directory
+    mode: '0755'
+  loop: '{{ archlinux_k3s_subvolumes }}'
+
+- name: Mount k3s subvolumes
+  ansible.posix.mount:
+    src: '{{ archlinux_k3s_root_dev }}'
+    path: '{{ item.path }}'
+    fstype: btrfs
+    opts: subvol={{ item.name }}
+    state: mounted
+  loop: '{{ archlinux_k3s_subvolumes }}'

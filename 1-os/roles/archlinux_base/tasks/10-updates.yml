@@ -64,14 +64,9 @@
     upgrade: true
   register: updated_pkgs
 
-- name: Update grub if needed
+- name: Trigger grub update if needed
   when: 'updated_pkgs.changed and "packages" in updated_pkgs and "grub" in updated_pkgs.packages'
-  block:
-    - name: Update grub installation
-      ansible.builtin.command:
-        cmd: grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB --removable
-        creates: # nothing
-    - name: Update grub config
-      ansible.builtin.command:
-        cmd: grub-mkconfig -o /boot/grub/grub.cfg
-        creates: # nothing
+  ansible.builtin.assert: { that: true, quiet: true }
+  changed_when: true
+  notify:
+    - grub-update

@@ -9,6 +9,6 @@
 - name: Cleanup fstab
   ansible.builtin.replace:
     path: /etc/fstab
-    regexp: 'subvolid=[0-9]+,'
-    replace: ''
+    regexp: 'subvolid=[0-9]+,subvol='
+    replace: 'subvol='
     backup: true

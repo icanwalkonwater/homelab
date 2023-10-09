@@ -23,3 +23,7 @@ argument_specs:
             required: true
         required: true
         description: List of additional subvolumes and mountpoints to isolate k3s from the rest of the filesystem
+      archlinux_k3s_enable_dual_stack_ipv46:
+        type: bool
+        required: false
+        description: Wether or not to enalbe IPv4/6 dual stack

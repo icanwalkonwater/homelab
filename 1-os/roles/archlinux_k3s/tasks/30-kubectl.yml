@@ -1,0 +1,13 @@
+# vim: ft=yaml.ansible
+---
+- name: Install kubectl
+  ansible.builtin.package:
+    name: kubectl
+    state: present
+
+- name: Set KUBECONFIG
+  ansible.builtin.lineinfile:
+    path: /etc/environment
+    search_string: export KUBECONFIG
+    line: export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+    state: present

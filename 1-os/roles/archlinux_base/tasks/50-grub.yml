@@ -1,0 +1,27 @@
+# vim: ft=yaml.ansible
+---
+- name: Remove quiet from kernel command line
+  ansible.builtin.lineinfile:
+    path: /etc/default/grub
+    regexp: '^GRUB_CMDLINE_LINUX_DEFAULT="(?:(.*)(?:quiet)(.*)|(.*))"'
+    line: 'GRUB_CMDLINE_LINUX_DEFAULT="\1\2\3"'
+    backrefs: true
+    backup: true
+  notify:
+    - grub-update
+
+- name: Boot from the saved grub entry
+  ansible.builtin.lineinfile:
+    path: /etc/default/grub
+    regexp: '^GRUB_DEFAULT='
+    line: GRUB_DEFAULT=saved
+  notify:
+    - grub-update
+
+- name: Remember last boot option
+  ansible.builtin.lineinfile:
+    path: /etc/default/grub
+    regexp: '^#?GRUB_SAVEDEFAULT='
+    line: GRUB_SAVEDEFAULT=true
+  notify:
+    - grub-update

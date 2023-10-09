@@ -1,7 +1,30 @@
 # vim: ft=yaml.ansible
 ---
-- name: Restart k3s
+- name: Drain the node
+  become: true
+  kubernetes.core.k8s_drain:
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
+    name: '{{ inventory_hostname }}'
+  failed_when: false # Never make it fail, we are going to kill everything anyway
+  listen: k3s-restart
+
+- name: Stop k3s service
+  become: true
+  ansible.builtin.service:
+    name: k3s.service
+    state: stopped
+  listen: k3s-restart
+
+- name: Killall k3s
+  become: true
+  ansible.builtin.command:
+    cmd: k3s-killall
+    creates: # always run
+  listen: k3s-restart
+
+- name: Start k3s again
   become: true
   ansible.builtin.service:
     name: k3s.service
     state: restarted
+  listen: k3s-restart

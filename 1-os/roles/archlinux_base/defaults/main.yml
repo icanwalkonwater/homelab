@@ -4,8 +4,11 @@ archlinux_base_updates_download_period: 'Tue *-*-* 5:00:00 Europe/Paris'
 archlinux_base_update_mirrors_period: '*-*-1 5:00:00 Europe/Paris'
 archlinux_base_needed_packages:
   - base
+  # Kernels (additional LTS kernel to always have something not broken)
   - linux-hardened
+  - linux-lts
   - linux-firmware
+  # Bootloader
   - grub
   - efibootmgr
   - intel-ucode
@@ -15,6 +18,8 @@ archlinux_base_needed_packages:
   - pacman-contrib
   # Time
   - ntp
+  # AppArmor
+  - apparmor
   # Ansible
   - openssh
   - python

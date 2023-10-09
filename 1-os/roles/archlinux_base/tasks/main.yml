@@ -28,6 +28,11 @@
   ansible.builtin.import_tasks:
     file: 11-aur.yml
 
+- name: Setup AppArmor
+  become: true
+  ansible.builtin.import_tasks:
+    file: 12-apparmor.yml
+
 - name: Filesystem maintenance
   become: true
   ansible.builtin.import_tasks:
@@ -49,3 +54,8 @@
   become: true
   ansible.builtin.import_tasks:
     file: 40-service-account.yml
+
+- name: Tweak grub config
+  become: true
+  ansible.builtin.import_tasks:
+    file: 50-grub.yml

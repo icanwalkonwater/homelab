@@ -2,8 +2,9 @@
 
 transaction_syslog cron
 
-snapshot_preserve_min 24h
-snapshot_preserve 48h
+snapshot_create onchange
+snapshot_preserve_min latest
+snapshot_preserve {{ archlinux_base_snapshot_retention }}
 
 volume /mnt/rootfs
   snapshot_dir @snapshots

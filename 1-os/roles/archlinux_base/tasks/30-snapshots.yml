@@ -15,8 +15,8 @@
     state: mounted
 
 - name: Install btrbk config for periodic snapshots
-  ansible.builtin.copy:
-    src: '{{ role_path }}/files/btrbk-rootfs-periodic.conf'
+  ansible.builtin.template:
+    src: '{{ role_path }}/templates/btrbk-rootfs-periodic.conf.j2'
     dest: /etc/btrbk/btrbk-rootfs-periodic.conf
     mode: '0644'
     validate: btrbk --config %s --verbose --dry-run run

@@ -1,0 +1,10 @@
+[Unit]
+Description=Periodically run btrbk against root fs
+
+[Timer]
+Unit=btrbk-rootfs-snapshot.service
+OnCalendar=hourly
+
+[Install]
+WantedBy=timers.target
+

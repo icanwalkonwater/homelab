@@ -1,0 +1,45 @@
+# vim: ft=yaml.ansible
+---
+- name: Query btrfs filesystems
+  community.general.btrfs_info:
+  register: btrfs_info
+
+- name: Translate device ids to block devices
+  ansible.builtin.stat:
+    path: '{{ item }}'
+    follow: false
+  loop: '{{ storage_pool.devices }}'
+  register: pool_devices_stat
+  failed_when: not pool_devices_stat.stat.exists
+
+- name: Create filesystem
+  when: pool_devices_stat.results | map(attribute="stat.lnk_source") not in btrfs_info.filesystems | map(attribute="devices")
+  ansible.builtin.command:
+    cmd: |
+      mkfs.btrfs
+        --data {{ storage_pool.profile.data }}
+        --metadata {{ storage_pool.profile.metadata }}
+        --label {{ storage_pool.label }}
+        {{ storage_pool.devices | join(' ') }}
+    creates: # don't worry about it
+
+- name: Create mount point
+  ansible.builtin.file:
+    path: '{{ storage_pool.mountpoint }}'
+    state: directory
+    mode: '0755'
+
+- name: Mount storage pool
+  ansible.posix.mount:
+    src: '{{ storage_pool.devices[0] }}'
+    path: '{{ storage_pool.mountpoint }}'
+    fstype: btrfs
+    state: mounted
+    opts: noatime
+
+- name: Create subvolumes
+  community.general.btrfs_subvolume:
+    filesystem_device: '{{ storage_pool.devices[0] }}'
+    name: '{{ item.name }}'
+    state: present
+  loop: '{{ storage_pool.subvolumes }}'

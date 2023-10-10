@@ -1,0 +1,51 @@
+# vim: ft=yaml.ansible
+---
+argument_specs:
+  main:
+    options:
+      archlinux_storage_pools:
+        type: list
+        elements: dict
+        options:
+          devices:
+            type: list
+            elements: path
+            required: true
+            description: Needs to be a symlink to a real device, usually something like /dev/disk/by-id/xxxx
+          label:
+            type: str
+            required: true
+            description: Filesystem label to apply
+          mountpoint:
+            type: path
+            required: true
+            description: Where to mount the pool
+          profile:
+            type: dict
+            options:
+              data:
+                type: str
+                required: true
+              metadata:
+                type: str
+                required: true
+          subvolumes:
+            type: list
+            elements: dict
+            options:
+              name:
+                type: str
+                required: true
+                description: Name of the subvolume
+              snapshots:
+                type: dict
+                required: false
+                options:
+                  path:
+                    type: path
+                    required: true
+                    description: Where to put the snapshots, can be a relative to the subvolume
+                  retention:
+                    type: str
+                    required: true
+                    description: Btrbk style retention policy

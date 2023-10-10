@@ -1,0 +1,18 @@
+transaction_syslog cron
+
+snapshot_create onchange
+snapshot_preserve_min latest
+
+{% for pool in archlinux_storage_pools %}
+
+volume {{ pool.mountpoint }}
+{% for subvolume in pool.subvolumes %}
+{% if 'snapshots' in subvolume %}
+  subvolume {{ subvolume.name }}
+    snapshot_dir {{ subvolume.snapshots.path }}
+    snapshot_preserve {{ subvolume.snapshots.retention }}
+{% endif %}
+{% endfor %}
+
+{% endfor %}
+

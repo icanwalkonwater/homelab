@@ -1,0 +1,46 @@
+# vim: ft=yaml.ansible
+---
+- become: true # noqa: name[missing]
+  block:
+    - name: Handle each storage pool
+      ansible.builtin.include_tasks:
+        file: pool.yml
+      loop: '{{ archlinux_storage_pools }}'
+      loop_control:
+        loop_var: storage_pool
+
+- name: Enable btrfs scrub service
+  become: true
+  ansible.builtin.systemd:
+    name: btrfs-scrub@mnt-lucastrunk.timer
+    state: started
+    enabled: true
+
+- name: Install btrbk config for pools
+  become: true
+  ansible.builtin.template:
+    src: '{{ role_path }}/templates/btrbk-pools.conf.j2'
+    dest: /etc/btrbk/btrbk-pools.conf
+    mode: '0644'
+    validate: btrbk --config %s --verbose --dry-run run
+
+- name: Install btrbk service for pools
+  become: true
+  ansible.builtin.copy:
+    src: '{{ role_path }}/files/btrbk-pools.service'
+    dest: /etc/systemd/system/btrbk-pools.service
+    mode: '0644'
+
+- name: Install btrbk timer for pools
+  become: true
+  ansible.builtin.copy:
+    src: '{{ role_path }}/files/btrbk-pools.timer'
+    dest: /etc/systemd/system/btrbk-pools.timer
+    mode: '0644'
+
+- name: Enable btrbk timer for pools
+  become: true
+  ansible.builtin.systemd:
+    name: btrbk-pools.timer
+    state: started
+    enabled: true

@@ -5,4 +5,4 @@ namespace: argocd
 resources:
   - ./base/namespace.yml
   - ./base/argoproj.yml
-  - https://github.com/argoproj/argo-cd//manifests/cluster-install/?ref=v2.8.4&timeout=5m
+  - https://raw.githubusercontent.com/argoproj/argo-cd/v2.8.4/manifests/install.yaml

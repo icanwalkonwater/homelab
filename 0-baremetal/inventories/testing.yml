@@ -7,6 +7,21 @@ nodes:
       mac: 52:54:00:21:f3:2b
       disks:
         boot: /dev/disk/by-id/ata-QEMU_HARDDISK_QM00001
-        # storage:
-        #   - /dev/disk/by-id/ata-QEMU_HARDDISK_QM00003
-        #   - /dev/disk/by-id/ata-QEMU_HARDDISK_QM00005
+      storage_pools:
+        - devices:
+            - /dev/disk/by-id/ata-QEMU_HARDDISK_QM00003-part1
+            - /dev/disk/by-id/ata-QEMU_HARDDISK_QM00005-part1
+          label: lucastrunk
+          mountpoint: /mnt/lucastrunk
+          profile:
+            data: raid1
+            metadata: raid1
+          subvolumes:
+            - name: '@media'
+            - name: '@media/@staging'
+            - name: '@media/@storage'
+            - name: '@minecraft'
+              snapshots:
+                path: '@minecraft/@snapshots'
+                retention: 2h 7d
+            - name: '@minecraft/@snapshots'

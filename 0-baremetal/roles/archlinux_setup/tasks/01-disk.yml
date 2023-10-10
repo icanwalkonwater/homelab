@@ -32,6 +32,7 @@
   community.general.filesystem:
     dev: /dev/disk/by-partlabel/{{ archlinux_setup_partlabels.root }}
     fstype: btrfs
+    opts: --label rootfs
     state: present
 
 - name: Create BTRFS subvolumes

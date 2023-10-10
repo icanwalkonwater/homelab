@@ -20,25 +20,12 @@
     - role: archlinux_base
       vars:
         archlinux_base_svc_account_authorized_key: '{{ lookup("file", playbook_dir + "/service_account.key.pub") }}'
-        archlinux_base_root_dev: /dev/disk/by-id/ata-QEMU_HARDDISK_QM00001-part2
+        archlinux_base_root_dev: '{{ disks.boot }}-part2'
+        archlinux_base_snapshot_retention: 12h 7d 4w
+    - role: archlinux_storage
+      vars:
+        archlinux_storage_pools: '{{ storage_pools }}'
     - role: archlinux_k3s
       vars:
         archlinux_k3s_package: k3s-1.28-bin
-        archlinux_k3s_root_dev: /dev/disk/by-id/ata-QEMU_HARDDISK_QM00001-part2
-
-    # - role: archlinux_storage
-    #   vars:
-    #     archlinux_storage_pools:
-    #       - device: /dev/disk/by-id/ata-ST2000DM001-1ER164_Z501ER3V
-    #         profile:
-    #           metadata: dup
-    #           data: raid1
-    #         subvolumes:
-    #           - name: '@media'
-    #           - name: '@media/@staging'
-    #             snapshots:
-    #               max: 5
-    #               every: 1w
-    #           - name: '@media/@storage'
-    #           - name: '@minecraft'
-    #           - name: '@minecraft/@snapshots'
+        archlinux_k3s_root_dev: '{{ disks.boot }}-part2'

@@ -9,7 +9,7 @@
       become: true
       kubernetes.core.k8s:
         kubeconfig: /etc/rancher/k3s/k3s.yaml
-        definition: '{{ lookup("kubernetes.core.kustomize", dir="./argocd/base") }}'
+        definition: '{{ lookup("kubernetes.core.kustomize", dir="./argocd") }}'
         state: present
         apply: true
       run_once: true # noqa: run-once[task]

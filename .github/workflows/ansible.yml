@@ -6,6 +6,7 @@ on:
     paths:
       - 0-baremetal/**
       - 1-os/**
+      - 2-argocd/playbook_main.yml
       - .github/workflows/ansible.yml
   workflow_dispatch:
 
@@ -27,4 +28,4 @@ jobs:
         uses: ansible/ansible-lint@v6.20.3
         with:
           setup_python: true
-          args: ./0-baremetal ./1-os
+          args: ./0-baremetal ./1-os ./2-argocd/playbook_main.yml

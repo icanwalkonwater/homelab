@@ -2,6 +2,7 @@
 ---
 - name: Deploy ArgoCD
   hosts: nodes
+  strategy: linear
 
   tasks:
     - name: Deploy ArgoCD
@@ -11,4 +12,4 @@
         definition: '{{ lookup("kubernetes.core.kustomize", dir="./argocd/base") }}'
         state: present
         apply: true
-      run_once: true
+      run_once: true # noqa: run-once[task]

@@ -34,3 +34,17 @@
   register: k3s_service
   until: k3s_service is succeeded
   retries: 5
+
+- name: Get k3s kubeconfig
+  ansible.builtin.slurp:
+    src: /etc/rancher/k3s/k3s.yaml
+  run_once: true
+  register: kubeconfig_b64
+
+- name: Name write kubeconfig on localhost
+  become: false
+  ansible.builtin.copy:
+    content: '{{ kubeconfig_b64.content | b64decode | replace("127.0.0.1", hostvars[groups["nodes"][0]].ansible_host) }}'
+    dest: '{{ playbook_dir }}/kubeconfig.yml'
+    mode: '0600'
+  delegate_to: localhost

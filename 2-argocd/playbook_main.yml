@@ -1,0 +1,14 @@
+# vim: ft=yaml.ansible
+---
+- name: Deploy ArgoCD
+  hosts: nodes
+
+  tasks:
+    - name: Deploy ArgoCD
+      become: true
+      kubernetes.core.k8s:
+        kubeconfig: /etc/rancher/k3s/k3s.yaml
+        definition: '{{ lookup("kubernetes.core.kustomize", dir="./argocd/base") }}'
+        state: present
+        apply: true
+      run_once: true

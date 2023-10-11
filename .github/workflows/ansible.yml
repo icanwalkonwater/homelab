@@ -7,6 +7,7 @@ on:
       - 0-baremetal/**
       - 1-os/**
       - 2-argocd/playbook_main.yml
+      - collections/**
       - .github/workflows/ansible.yml
   workflow_dispatch:
 
@@ -26,6 +27,9 @@ jobs:
 
       - name: Run ansible-lint
         uses: ansible/ansible-lint@v6.20.3
+        env:
+          ANSIBLE_COLLECTIONS_PATH: ./collections
         with:
           setup_python: true
-          args: ./0-baremetal ./1-os ./2-argocd/playbook_main.yml
+          args: ./0-baremetal ./1-os ./2-argocd/playbook_main.yml ./collections
+

@@ -1,3 +1,0 @@
-# vim: ft=yaml.ansible
----
-pxe_server_state: null

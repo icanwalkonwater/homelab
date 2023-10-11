@@ -1,6 +1,6 @@
 # vim: ft=yaml.ansible
 ---
-nodes:
+masters:
   hosts:
     lucasvm0:
       ansible_host: 192.168.100.200
@@ -25,3 +25,7 @@ nodes:
                 path: '@minecraft/@snapshots'
                 retention: 2h 7d
             - name: '@minecraft/@snapshots'
+nodes:
+  children:
+    masters:
+

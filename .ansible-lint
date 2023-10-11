@@ -1,0 +1,6 @@
+---
+profile: production
+skip_list:
+  - galaxy[no-changelog]
+  - galaxy[tags]
+

@@ -1,9 +1,0 @@
-# vim: ft=yaml.ansible
----
-- name: Bootstrap installer via PXE
-  ansible.builtin.import_playbook: playbook_pxe_boot.yml
-
-- name: Install OS on the nodes
-  ansible.builtin.import_playbook: playbook_install.yml
-
-# - name: Finalize/Fix OS installation

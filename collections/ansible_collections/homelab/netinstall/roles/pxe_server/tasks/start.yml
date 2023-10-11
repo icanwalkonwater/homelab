@@ -1,5 +1,8 @@
  # vim: ft=yaml.ansible
 ---
+- name: Check if the docker daemon is reachable
+  community.docker.docker_host_info:
+
 - name: Download ArchLinux ISO
   ansible.builtin.get_url:
     url: https://mirrors.edge.kernel.org/archlinux/iso/latest/archlinux-x86_64.iso

@@ -9,8 +9,8 @@ jobs:
     name: Lint Nix Flakes
     runs-on: ubuntu-latest
     steps:
-      - use: actions/checkout@v4
-      - use: DeterminateSystems/flake-checker-action@v4
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/flake-checker-action@v4
         with:
           flake-lock-path: ./collections/ansible_collections/homelab/netinstall/roles/pxe_server/files/flake.lock
 

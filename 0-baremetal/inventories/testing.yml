@@ -5,8 +5,7 @@ masters:
     lucasvm0:
       ansible_host: 192.168.100.200
       mac: 52:54:00:21:f3:2b
-      disks:
-        boot: /dev/disk/by-id/ata-QEMU_HARDDISK_QM00001
+      boot_disk: /dev/disk/by-id/ata-QEMU_HARDDISK_QM00001
       storage_pools:
         - devices:
             - /dev/disk/by-id/ata-QEMU_HARDDISK_QM00003-part1

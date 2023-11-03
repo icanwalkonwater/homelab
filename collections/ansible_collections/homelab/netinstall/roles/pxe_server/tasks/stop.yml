@@ -4,8 +4,7 @@
   community.docker.docker_host_info:
 
 - name: Stop PXE server
-  ansible.builtin.command:
-    chdir: '{{ role_path }}/files'
-    cmd: docker compose -p {{ pxe_server_compose_name }} down -v
-    creates:
+  community.docker.docker_container:
+    name: '{{ pxe_server_container_name }}'
+    state: absent
 

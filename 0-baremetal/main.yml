@@ -5,7 +5,7 @@
   tasks:
     - name: Generate temporary SSH keypair for installation
       community.crypto.openssh_keypair:
-        path: '{{ playbook_dir }}/archiso_ssh.key'
+        path: '{{ playbook_dir }}/install_ssh.key'
         size: 384
         type: ecdsa
       register: install_ssh_key
@@ -22,11 +22,6 @@
         tasks_from: start
       vars:
         pxe_server_ssh_authorized_key: '{{ install_ssh_key.public_key }}'
-
-    - name: Start ephemeral pacman proxy
-      ansible.builtin.import_role:
-        name: homelab.netinstall.pacoloco
-        tasks_from: start
 
 - name: Install OS on nodes
   hosts: nodes
@@ -45,29 +40,28 @@
     - name: Gather facts
       ansible.builtin.setup:
 
-    - name: Start installation
-      ansible.builtin.import_role:
-        name: homelab.netinstall.archlinux_setup
-      vars:
-        archlinux_setup_disk_boot: '{{ disks["boot"] }}'
-        archlinux_setup_pacman_proxy:
-          enabled: true
-          mirror: http://192.168.1.65:9129/repo/archlinux/$repo/os/$arch
-        archlinux_setup_ansible_account_ssh_authorized_key: '{{ lookup("file", playbook_dir + "/service_account.key.pub") }}'
+    # - name: Start installation
+    #   ansible.builtin.import_role:
+    #     name: homelab.netinstall.archlinux_setup
+    #   vars:
+    #     archlinux_setup_disk_boot: '{{ boot_disk }}'
+    #     archlinux_setup_pacman_proxy:
+    #       enabled: true
+    #       mirror: http://192.168.1.65:9129/repo/archlinux/$repo/os/$arch
+    #     archlinux_setup_ansible_account_ssh_authorized_key: '{{ lookup("file", playbook_dir + "/service_account.key.pub") }}'
 
-    - name: Shutdown nodes
+    # Can't use the shutdown module because it relies on an hardcoded path for some reason.
+    # Will always failed with something like "connection lost".
+    - name: Shutdown nodes # noqa: command-instead-of-module
       become: true
-      community.general.shutdown:
+      ansible.builtin.command:
+        cmd: systemctl poweroff
+        creates: # nothing
 
 - name: Cleanup installation
   hosts: localhost
   gather_facts: false
   tasks:
-    - name: Stop ephemeral pacman proxy
-      ansible.builtin.import_role:
-        name: homelab.netinstall.pacoloco
-        tasks_from: stop
-
     - name: Stop ephemeral PXE server
       ansible.builtin.import_role:
         name: homelab.netinstall.pxe_server

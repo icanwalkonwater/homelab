@@ -1,4 +1,0 @@
-#cloud-config
-disable_root: true
-ssh_authorized_keys:
-  - ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBJ9nC+5PKtgBq9xbhnEUUrWtdCwDEOJ9+GoMXHAfnN9gqyw/2fCZuV8panXcyiCkajVnqJApa37rj9xheLPkY0gjpVdh/LPZdOgy4+ZcCpdcyqLWm50Qdz+nLX9+ElaP8Q==

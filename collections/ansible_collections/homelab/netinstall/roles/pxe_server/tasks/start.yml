@@ -3,29 +3,31 @@
 - name: Check if the docker daemon is reachable
   community.docker.docker_host_info:
 
-- name: Download ArchLinux ISO
-  ansible.builtin.get_url:
-    url: https://mirrors.edge.kernel.org/archlinux/iso/latest/archlinux-x86_64.iso
-    dest: '{{ role_path }}/files/raw/archlinux.iso'
-    checksum: sha256:https://mirrors.edge.kernel.org/archlinux/iso/latest/sha256sums.txt
-    mode: '0440'
-
-- name: Extract ISO
-  ansible.builtin.command:
-    chdir: '{{ role_path }}/files/static/iso'
-    cmd: bsdtar -xf {{ role_path }}/files/raw/archlinux.iso
-    creates: '{{ role_path }}/files/static/iso/arch/boot/x86_64/initramfs-linux.img'
-
-- name: Generate cloud-init's user-data
+- name: Generate flake.nix with the correct SSH key
   ansible.builtin.template:
-    src: '{{ role_path }}/templates/user-data.j2'
-    dest: '{{ role_path }}/files/static/cloud-init/user-data'
+    src: '{{ role_path }}/templates/flake.nix.j2'
+    dest: '{{ role_path }}/files/flake.nix'
     mode: '0440'
 
-- name: Start PXE server
+- name: Generate PXE server as docker image
   ansible.builtin.command:
     chdir: '{{ role_path }}/files'
-    cmd: docker compose -p {{ pxe_server_compose_name }} up --force-recreate -d
-    creates:
-  environment:
-    HOST_STATIC_FILES: '{{ ansible_default_ipv4.address }}'
+    cmd: 'nix build .#docker -o ./pxe-server-full.tar.gz'
+    creates: # nix build is cached anyway
+
+- name: Load PXE server image into docker
+  community.docker.docker_image:
+    name: pxe-server-full
+    source: load
+    load_path: '{{ role_path }}/files/pxe-server-full.tar.gz'
+    state: present
+    force_source: true
+
+- name: Start PXE server
+  community.docker.docker_container:
+    name: '{{ pxe_server_container_name }}'
+    image: pxe-server-full:latest
+    network_mode: host
+    recreate: true
+    state: started
+

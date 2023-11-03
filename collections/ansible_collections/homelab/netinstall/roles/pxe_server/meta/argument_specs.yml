@@ -1,12 +1,17 @@
 # vim: ft=yaml.ansible
 ---
 argument_specs:
-  main:
+  start:
     options:
       pxe_server_container_name:
         type: str
         required: true
       pxe_server_ssh_authorized_key:
         type: 'str'
+        required: true
+  stop:
+    options:
+      pxe_server_container_name:
+        type: str
         required: true
 

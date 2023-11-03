@@ -50,13 +50,61 @@
     #       mirror: http://192.168.1.65:9129/repo/archlinux/$repo/os/$arch
     #     archlinux_setup_ansible_account_ssh_authorized_key: '{{ lookup("file", playbook_dir + "/service_account.key.pub") }}'
 
-    # Can't use the shutdown module because it relies on an hardcoded path for some reason.
-    # Will always failed with something like "connection lost".
-    - name: Shutdown nodes # noqa: command-instead-of-module
+    - name: Setup boot drive
+      become: true
+      ansible.builtin.import_role:
+        name: homelab.netinstall.disk_setup
+      vars:
+        disk_setup_dev: '{{ boot_disk }}'
+        disk_setup_partitions_spec: |-
+          label: gpt
+          size=512M, type=U, name=boot
+          size=+,    type=L, name=root
+        disk_setup_mountpoint_prefix: /mnt
+        disk_setup_filesystems:
+          - dev: /dev/disk/by-partlabel/boot
+            type: vfat
+            opts: -F32 -n boot
+            mountpoint: /boot
+          - dev: /dev/disk/by-partlabel/root
+            type: btrfs
+            opts: --label nixos
+            mountpoint: /mnt/rootfs
+        disk_setup_btrfs_subvolumes:
+          - dev: /dev/disk/by-label/nixos
+            subvolumes:
+              - name: '@'
+                mountpoint: /
+              - name: '@nix'
+                mountpoint: /nix
+              - name: '@var'
+                mountpoint: /var
+              - name: '@log'
+                mountpoint: /var/log
+              - name: '@root'
+                mountpoint: /root
+              - name: '@home'
+                mountpoint: /home
+
+    - name: Generate NixOS config
       become: true
       ansible.builtin.command:
-        cmd: systemctl poweroff
+        cmd: nixos-generate-config --root /mnt
+
+    - assert:
+        that: [false]
+
+    # Workaround the shutdown module not using the $PATH
+    - name: Find shutdown command path # noqa: risky-shell-pipe
+      ansible.builtin.shell:
+        cmd: 'dirname $(whereis -b shutdown | cut -d" " -f2)'
         creates: # nothing
+      register: shutdown_path
+
+    - name: Shutdown nodes
+      become: true
+      community.general.shutdown:
+        search_paths: ['{{ shutdown_path.stdout }}']
 
 - name: Cleanup installation
   hosts: localhost
@@ -67,11 +115,11 @@
         name: homelab.netinstall.pxe_server
         tasks_from: stop
 
-    - name: Delete temporary SSH keypair
-      ansible.builtin.file:
-        path: '{{ item }}'
-        state: absent
-      loop:
-        - '{{ install_ssh_key.filename }}'
-        - '{{ install_ssh_key.filename }}.pub'
+    # - name: Delete temporary SSH keypair
+    #   ansible.builtin.file:
+    #     path: '{{ item }}'
+    #     state: absent
+    #   loop:
+    #     - '{{ install_ssh_key.filename }}'
+    #     - '{{ install_ssh_key.filename }}.pub'
 

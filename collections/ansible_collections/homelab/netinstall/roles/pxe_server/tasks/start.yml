@@ -1,4 +1,4 @@
- # vim: ft=yaml.ansible
+# vim: ft=yaml.ansible
 ---
 - name: Check if the docker daemon is reachable
   community.docker.docker_host_info:
@@ -8,12 +8,14 @@
     src: '{{ role_path }}/templates/flake.nix.j2'
     dest: '{{ role_path }}/files/flake.nix'
     mode: '0440'
+  register: flake_generate
 
 - name: Generate PXE server as docker image
   ansible.builtin.command:
     chdir: '{{ role_path }}/files'
     cmd: 'nix build .#docker -o ./pxe-server-full.tar.gz'
     creates: # nix build is cached anyway
+  when: flake_generate is changed
 
 - name: Load PXE server image into docker
   community.docker.docker_image:
@@ -22,6 +24,7 @@
     load_path: '{{ role_path }}/files/pxe-server-full.tar.gz'
     state: present
     force_source: true
+  when: flake_generate is changed
 
 - name: Start PXE server
   community.docker.docker_container:

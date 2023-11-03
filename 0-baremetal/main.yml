@@ -90,9 +90,7 @@
       become: true
       ansible.builtin.command:
         cmd: nixos-generate-config --root /mnt
-
-    - assert:
-        that: [false]
+        creates: /mnt/etc/nixos/hardware-configuration.nix
 
     # Workaround the shutdown module not using the $PATH
     - name: Find shutdown command path # noqa: risky-shell-pipe

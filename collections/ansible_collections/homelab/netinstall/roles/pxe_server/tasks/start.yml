@@ -10,14 +10,14 @@
     mode: '0440'
   register: flake_generate
 
-- name: Generate PXE server as docker image
+- name: Generate PXE server as docker image # noqa: no-handler
   ansible.builtin.command:
     chdir: '{{ role_path }}/files'
     cmd: 'nix build .#docker -o ./pxe-server-full.tar.gz'
     creates: # nix build is cached anyway
   when: flake_generate is changed
 
-- name: Load PXE server image into docker
+- name: Load PXE server image into docker # noqa: no-handler
   community.docker.docker_image:
     name: pxe-server-full
     source: load

@@ -1,8 +1,7 @@
 name: CI - Ansible
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
     paths:
       - 0-baremetal/**
       - 1-os/**

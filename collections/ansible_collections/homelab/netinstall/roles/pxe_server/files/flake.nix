@@ -7,7 +7,7 @@
   outputs = { nixpkgs, flake-utils, ... }: 
     # Be "generic" over the system architecture.
     # In reality we don't care 'its just easier to not have to type x86_64-linux each time.
-    flake-utils.lib.eachDefaultSystem (system:
+    flake-utils.lib.eachSystem [ "x86_64-linux" ] (system:
       let 
         pkgs = nixpkgs.legacyPackages.${system};
       in rec {
@@ -58,6 +58,7 @@
                 hashedPassword = null;
                 openssh.authorizedKeys.keyFiles = [ ./authorized_key.pub ];
               };
+
               # Grant passwordless sudo to the ansible user
               security.sudo.extraRules = [
                 {
@@ -73,23 +74,20 @@
 
         # Make a docker image with pixiecore serving our netboot files
         packages.docker =
-          let
-            netbootFiles = packages.netboot;
-          in
           pkgs.dockerTools.buildLayeredImage {
             name = "pxe-server-full";
             tag = "latest";
             contents = [
               pkgs.pixiecore
-              netbootFiles
+              packages.netboot
             ];
             maxLayers = 32;
             config = {
               Entrypoint = "/bin/pixiecore";
               Cmd = [
                 "boot"
-                "${netbootFiles.out}/linux"
-                "${netbootFiles.out}/initrd"
+                "${packages.netboot.out}/linux"
+                "${packages.netboot.out}/initrd"
                 "--cmdline"
                 nixosConfigurations.netboot-installer.config.system.build.cmdline
                 "--dhcp-no-bind"

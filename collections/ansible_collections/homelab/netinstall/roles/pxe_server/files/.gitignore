@@ -1,2 +1,2 @@
 *.tar.gz
-flake.nix
+authorized_key.pub

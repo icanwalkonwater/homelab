@@ -3,19 +3,29 @@
 - name: Check if the docker daemon is reachable
   community.docker.docker_host_info:
 
-- name: Generate flake.nix with the correct SSH key
-  ansible.builtin.template:
-    src: '{{ role_path }}/templates/flake.nix.j2'
-    dest: '{{ role_path }}/files/flake.nix'
-    mode: '0440'
-  register: flake_generate
+- name: Put ssh key in file
+  ansible.builtin.copy:
+    dest: '{{ role_path }}/files/authorized_key.pub'
+    content: '{{ pxe_server_ssh_authorized_key }}'
+    mode: '0644'
+
+- name: Get docker image stat
+  ansible.builtin.stat:
+    path: '{{ role_path }}/files/pxe-server-full.tar.gz'
+    follow: true
+  register: image_stat_before
 
 - name: Generate PXE server as docker image # noqa: no-handler
   ansible.builtin.command:
     chdir: '{{ role_path }}/files'
-    cmd: 'nix build .#docker -o ./pxe-server-full.tar.gz'
+    cmd: 'nix build path:{{ role_path }}/files#docker -o ./pxe-server-full.tar.gz'
     creates: # nix build is cached anyway
-  when: flake_generate is changed
+
+- name: Get updated image stat
+  ansible.builtin.stat:
+    path: '{{ role_path }}/files/pxe-server-full.tar.gz'
+    follow: true
+  register: image_stat_after
 
 - name: Load PXE server image into docker # noqa: no-handler
   community.docker.docker_image:
@@ -24,7 +34,7 @@
     load_path: '{{ role_path }}/files/pxe-server-full.tar.gz'
     state: present
     force_source: true
-  when: flake_generate is changed
+  when: (not image_stat_before.stat.exists) or (image_stat_before.stat.ctime != image_stat_after.stat.ctime)
 
 - name: Start PXE server
   community.docker.docker_container:

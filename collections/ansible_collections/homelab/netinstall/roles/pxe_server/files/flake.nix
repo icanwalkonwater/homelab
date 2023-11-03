@@ -4,7 +4,7 @@
     flake-utils.url = "github:numtide/flake-utils/ff7b65b44d01cf9ba6a71320833626af21126384";
   };
 
-  outputs = { self, nixpkgs, flake-utils, ... }: 
+  outputs = { nixpkgs, flake-utils, ... }: 
     # Be "generic" over the system architecture.
     # In reality we don't care 'its just easier to not have to type x86_64-linux each time.
     flake-utils.lib.eachDefaultSystem (system:
@@ -56,7 +56,7 @@
                 useDefaultShell = true;
 
                 hashedPassword = null;
-                openssh.authorizedKeys.keys = [ "{{ pxe_server_ssh_authorized_key }}" ];
+                openssh.authorizedKeys.keyFiles = [ ./authorized_key.pub ];
               };
               # Grant passwordless sudo to the ansible user
               security.sudo.extraRules = [

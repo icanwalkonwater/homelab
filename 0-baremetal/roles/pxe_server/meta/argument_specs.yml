@@ -1,0 +1,17 @@
+# vim: ft=yaml.ansible
+---
+argument_specs:
+  start:
+    options:
+      pxe_server_container_name:
+        type: str
+        required: true
+      pxe_server_image_archive:
+        type: path
+        required: true
+  stop:
+    options:
+      pxe_server_container_name:
+        type: str
+        required: true
+

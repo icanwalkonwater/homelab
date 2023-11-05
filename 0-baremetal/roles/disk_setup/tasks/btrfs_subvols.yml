@@ -1,0 +1,34 @@
+# vim: ft=yaml.ansible
+---
+- name: Create subvolumes
+  community.general.btrfs_subvolume:
+    filesystem_device: '{{ item.dev }}'
+    automount: true
+    name: '{{ subvolume.name }}'
+    state: present
+  loop: '{{ item.subvolumes }}'
+  loop_control:
+    loop_var: subvolume
+    label: '{{ subvolume.name }}'
+
+- name: Create subvolume mountpoints
+  ansible.builtin.file:
+    name: '{{ disk_setup_mountpoint_prefix }}{{ subvolume.mountpoint }}'
+    state: directory
+    mode: '0755'
+  loop: '{{ item.subvolumes | selectattr("mountpoint", "defined") }}'
+  loop_control:
+    loop_var: subvolume
+    label: '{{ subvolume.mountpoint }}'
+
+- name: Mount subvolumes
+  ansible.posix.mount:
+    src: '{{ item.dev }}'
+    path: '{{ disk_setup_mountpoint_prefix }}{{ subvolume.mountpoint }}'
+    fstype: btrfs
+    opts: subvol={{ subvolume.name }}
+    state: ephemeral
+  loop: '{{ item.subvolumes | selectattr("mountpoint", "defined") }}'
+  loop_control:
+    loop_var: subvolume
+    label: '{{ subvolume.name }} on {{ subvolume.mountpoint }}'

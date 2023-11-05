@@ -1,0 +1,21 @@
+# vim: ft=yaml.ansible
+---
+- name: Check if the docker daemon is reachable
+  community.docker.docker_host_info:
+
+- name: Load PXE server image into docker # noqa: no-handler
+  community.docker.docker_image:
+    name: pxe-server-full
+    source: load
+    load_path: '{{ pxe_server_image_archive }}'
+    state: present
+    force_source: true
+
+- name: Start PXE server
+  community.docker.docker_container:
+    name: '{{ pxe_server_container_name }}'
+    image: pxe-server-full:latest
+    network_mode: host
+    recreate: true
+    state: started
+

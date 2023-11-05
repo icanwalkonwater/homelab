@@ -1,7 +1,0 @@
-# vim: ft=yaml.ansible
----
-nodes:
-  hosts:
-    lucasbox0:
-      ansible_host: 192.168.1.27
-      mac: 1c:1b:0d:72:67:4a

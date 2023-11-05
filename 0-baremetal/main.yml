@@ -3,28 +3,13 @@
 - name: Prepare installation
   hosts: localhost
   tasks:
-    - name: Generate temporary SSH keypair for installation
-      community.crypto.openssh_keypair:
-        path: '{{ playbook_dir }}/install_ssh.key'
-        size: 384
-        type: ecdsa
-      register: install_ssh_key
-
-    - name: Generate service account SSH keypair
-      community.crypto.openssh_keypair:
-        path: '{{ playbook_dir }}/service_account.key'
-        size: 384
-        type: ecdsa
-
     - name: Start ephemeral PXE server
       ansible.builtin.import_role:
-        name: homelab.netinstall.pxe_server
+        name: pxe_server
         tasks_from: start
-      vars:
-        pxe_server_ssh_authorized_key: '{{ install_ssh_key.public_key }}'
 
 - name: Install OS on nodes
-  hosts: nodes
+  hosts: all
   gather_facts: false # delayed until after we woke up the target
   tasks:
     - name: Wake up nodes
@@ -40,20 +25,10 @@
     - name: Gather facts
       ansible.builtin.setup:
 
-    # - name: Start installation
-    #   ansible.builtin.import_role:
-    #     name: homelab.netinstall.archlinux_setup
-    #   vars:
-    #     archlinux_setup_disk_boot: '{{ boot_disk }}'
-    #     archlinux_setup_pacman_proxy:
-    #       enabled: true
-    #       mirror: http://192.168.1.65:9129/repo/archlinux/$repo/os/$arch
-    #     archlinux_setup_ansible_account_ssh_authorized_key: '{{ lookup("file", playbook_dir + "/service_account.key.pub") }}'
-
     - name: Setup boot drive
       become: true
       ansible.builtin.import_role:
-        name: homelab.netinstall.disk_setup
+        name: disk_setup
       vars:
         disk_setup_dev: '{{ boot_disk }}'
         disk_setup_partitions_spec: |-
@@ -73,6 +48,7 @@
         disk_setup_btrfs_subvolumes:
           - dev: /dev/disk/by-label/nixos
             subvolumes:
+              # Classic stuff
               - name: '@'
                 mountpoint: /
               - name: '@nix'
@@ -85,12 +61,15 @@
                 mountpoint: /root
               - name: '@home'
                 mountpoint: /home
+              # Store snapshots in a not mounted subvol
+              - name: '@snapshots'
+              # K3s subvols
 
-    - name: Generate NixOS config
-      become: true
-      ansible.builtin.command:
-        cmd: nixos-generate-config --root /mnt
-        creates: /mnt/etc/nixos/hardware-configuration.nix
+    # - name: Generate NixOS config
+    #   become: true
+    #   ansible.builtin.command:
+    #     cmd: nixos-generate-config --root /mnt
+    #     creates: /mnt/etc/nixos/hardware-configuration.nix
 
     # Workaround the shutdown module not using the $PATH
     - name: Find shutdown command path # noqa: risky-shell-pipe
@@ -99,10 +78,10 @@
         creates: # nothing
       register: shutdown_path
 
-    - name: Shutdown nodes
-      become: true
-      community.general.shutdown:
-        search_paths: ['{{ shutdown_path.stdout }}']
+    # - name: Shutdown nodes
+    #   become: true
+    #   community.general.shutdown:
+    #     search_paths: ['{{ shutdown_path.stdout }}']
 
 - name: Cleanup installation
   hosts: localhost
@@ -110,14 +89,6 @@
   tasks:
     - name: Stop ephemeral PXE server
       ansible.builtin.import_role:
-        name: homelab.netinstall.pxe_server
+        name: pxe_server
         tasks_from: stop
-
-    # - name: Delete temporary SSH keypair
-    #   ansible.builtin.file:
-    #     path: '{{ item }}'
-    #     state: absent
-    #   loop:
-    #     - '{{ install_ssh_key.filename }}'
-    #     - '{{ install_ssh_key.filename }}.pub'
 

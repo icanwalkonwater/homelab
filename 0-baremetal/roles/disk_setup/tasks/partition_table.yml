@@ -1,0 +1,25 @@
+# vim: ft=yaml.ansible
+---
+- name: Get device info
+  community.general.parted:
+    device: '{{ item.device }}'
+    unit: MiB
+  register: device_info
+
+- name: Make sure the device is not partitionned
+  ansible.builtin.assert:
+    msg: Device is already partitionned, if this is intentional, pass `disk_setup_spec.options.overridePartitionTables=true`
+    that:
+      - device_info.partitions | length == 0
+    quiet: true
+  when: not disk_setup_spec.options.overridePartitionTables
+
+- name: Partition disk
+  ansible.builtin.command:
+    cmd: sfdisk {{ item.device }} --wipe-partitions always
+    stdin: |-
+      label: {{ item.label }}
+      {% for partition in item.partitions %}
+      size={{ partition.size }}, type={{ partition.type }}, name={{ partition.label }}
+      {% endfor %}
+    creates: # many things

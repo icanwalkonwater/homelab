@@ -35,7 +35,6 @@ in
         cp -r ./main.yml ./roles $out
         '';
     };
-
   in
     pkgs.writeShellApplication {
       name = "homelab-baremetal-playbook-run";

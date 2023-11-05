@@ -30,40 +30,7 @@
       ansible.builtin.import_role:
         name: disk_setup
       vars:
-        disk_setup_dev: '{{ boot_disk }}'
-        disk_setup_partitions_spec: |-
-          label: gpt
-          size=512M, type=U, name=boot
-          size=+,    type=L, name=root
-        disk_setup_mountpoint_prefix: /mnt
-        disk_setup_filesystems:
-          - dev: /dev/disk/by-partlabel/boot
-            type: vfat
-            opts: -F32 -n boot
-            mountpoint: /boot
-          - dev: /dev/disk/by-partlabel/root
-            type: btrfs
-            opts: --label nixos
-            mountpoint: /mnt/rootfs
-        disk_setup_btrfs_subvolumes:
-          - dev: /dev/disk/by-label/nixos
-            subvolumes:
-              # Classic stuff
-              - name: '@'
-                mountpoint: /
-              - name: '@nix'
-                mountpoint: /nix
-              - name: '@var'
-                mountpoint: /var
-              - name: '@log'
-                mountpoint: /var/log
-              - name: '@root'
-                mountpoint: /root
-              - name: '@home'
-                mountpoint: /home
-              # Store snapshots in a not mounted subvol
-              - name: '@snapshots'
-              # K3s subvols
+        disk_setup_spec: '{{ disk_layout }}'
 
     # - name: Generate NixOS config
     #   become: true

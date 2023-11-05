@@ -13,18 +13,19 @@
         ];
         label = "lucastrunk";
         subvolumes = [
-          { name = "@media"; }
-          { name = "@media/@staging"; }
-          { name = "@media/@storage"; }
-          { name = "@minecraft"; }
-          { name = "@snapshots"; }
+          "@media"
+          "@media/@staging"
+          "@media/@storage"
+          "@minecraft"
+          "@snapshots"
         ];
         mountPoint = toString /mnt/trunk;
       };
     in {
-      # We don't want to touch the raid setup, only mount it
-      partitionTables = boot.partitionTables;
-      fileSystems = boot.fileSystems;
+      # Its a VM, we don't care
+      options.overridePartitionTables = true;
+      partitionTables = boot.partitionTables ++ storagePool.partitionTables;
+      fileSystems = boot.fileSystems ++ storagePool.fileSystems;
       mountPoints = boot.mountPoints ++ storagePool.mountPoints;
     };
   };

@@ -13,12 +13,17 @@
       diskLayout = validateDiskLayout diskLayout;
     };
 
-    validateDiskLayout = { partitionTables ? [], fileSystems ? [], mountPoints ? [] }:
+    validateDiskLayout = { options ? null, partitionTables ? [], fileSystems ? [], mountPoints ? [] }:
     {
+      options = validateOptions options; 
       partitionTables = builtins.map validatePartitionTable partitionTables;
       fileSystems = builtins.map validateFileSystem fileSystems;
       mountPoints = builtins.map validateMountPoint mountPoints;
     };
+
+    validateOptions = { overridePartitionTables ? false }:
+      assert builtins.isBool overridePartitionTables;
+      { inherit overridePartitionTables; };
 
     validatePartitionTable = { device, label ? "gpt", partitions }:
       assert builtins.isPath (/. + device);
@@ -34,7 +39,7 @@
       assert builtins.isString label;
       part;
     
-    validateFileSystem = { devices, type, options, subvolumes ? [] }:
+    validateFileSystem = { devices, type, options, subvolumes ? [] }@fs:
       assert builtins.length devices > 0;
       assert builtins.all builtins.isString devices;
       assert builtins.isString type;
@@ -42,15 +47,8 @@
 
       assert builtins.length devices > 1 -> type == "btrfs";
       assert builtins.length subvolumes > 0 -> type == "btrfs";
-    {
-      inherit devices type options;
-      subvolumes = builtins.map validateSubvolume subvolumes;
-    };
-
-    validateSubvolume = { name, mountPoint ? null }@subvol:
-      assert builtins.isString name;
-      assert mountPoint != null -> builtins.isString mountPoint;
-      subvol;
+      assert builtins.all builtins.isString subvolumes;
+      fs;
 
     validateMountPoint = { device, type, mountPoint, options ? null }@mnt:
       assert builtins.isString device;
@@ -81,7 +79,7 @@
     ];
   in {
     partitionTables = [{
-    inherit device;
+      inherit device;
       label = "gpt";
       partitions = [
         { size = "256MiB"; type = "uefi"; label = "boot"; }
@@ -96,15 +94,15 @@
         devices = [(toString /dev/disk/by-partlabel/root)];
         type = "btrfs";
         options = "--label nixos";
-        inherit subvolumes;
+        subvolumes = builtins.map ({ name, ... }: name) subvolumes;
       }
     ];
 
-    mountPoints = (map (s: {
+    mountPoints = (map ({ name, mountPoint }: {
       device = toString /dev/disk/by-label/nixos;
       type = "btrfs";
-      inherit (s) mountPoint;
-      options = "subvol=${s.name}";
+      inherit mountPoint;
+      options = "subvol=${name}";
     }) (builtins.filter (s: builtins.hasAttr "mountPoint" s) subvolumes))
       ++
     [
@@ -125,7 +123,7 @@
   mkDiskLayoutBig = { devices, label, subvolumes ? [], mountPoint }:
     assert (builtins.length devices) >= 2;
     assert (builtins.all (d: builtins.typeOf d == "string") devices);
-    assert (builtins.all (s: builtins.hasAttr "name" s) subvolumes);
+    assert builtins.all builtins.isString subvolumes;
     assert builtins.typeOf mountPoint == "string";
   {
     partitionTables = (nixpkgs.lib.lists.imap0 (i: device: {
@@ -135,7 +133,7 @@
     }) devices);
 
     fileSystems = [{
-      inherit devices;
+      devices = builtins.genList (i: "/dev/disk/by-partlabel/${label}-${toString i}") (builtins.length devices);
       type = "btrfs";
       options = "--label ${label} --data raid1 --metadata raid1";
       inherit subvolumes;
@@ -148,4 +146,4 @@
     }];
   };
 
-  }
+}

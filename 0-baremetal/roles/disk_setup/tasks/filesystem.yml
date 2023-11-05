@@ -1,0 +1,31 @@
+# vim: ft=yaml.ansible
+---
+- name: Only allow multiple devices on btrfs
+  ansible.builtin.assert:
+    that:
+      - item.type == "btrfs" or (item.devices | length == 1)
+      - item.type == "btrfs" or (item["subvolumes"] | default([]) | length == 0)
+
+- name: Create simple filesystem
+  community.general.filesystem:
+    dev: '{{ item.devices | first }}'
+    fstype: '{{ item.type }}'
+    opts: '{{ item["options"] | default("") }}'
+  when: item.devices | length == 1
+
+- name: Create multi device btrfs filesystem
+  ansible.builtin.command:
+    cmd: 'mkfs.btrfs {{ item["options"] | default("") }} {{ item.devices | join(" ") }}'
+    creates: # idk
+  when: item.type == "btrfs" and (item.devices | length > 1)
+
+- name: Create btrfs subvolumes
+  community.general.btrfs_subvolume:
+    filesystem_device: '{{ item.devices | first }}'
+    automount: true
+    name: '{{ subvolume }}'
+    state: present
+  loop: '{{ item.subvolumes }}'
+  loop_control:
+    loop_var: subvolume
+  when: item.type == "btrfs"

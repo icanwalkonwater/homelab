@@ -2,57 +2,74 @@
 ---
 argument_specs:
   main:
+    type: dict
     options:
-      disk_setup_dev:
-        type: path
-        required: true
-        description: The device to partition
-      disk_setup_partitions_spec:
-        type: str
-        required: true
-        description: A valid sfdisk input format, man sfdisk for more info
-      disk_setup_override_partitions:
-        type: bool
-        description: Partition disk event if partitions already exists
-      disk_setup_mountpoint_prefix:
-        type: path
-        required: true
-        description: Prefix all mountpoint by this
-      disk_setup_filesystems:
-        type: list
-        elements: dict
+      disk_setup_spec:
+        type: dict
         options:
-          dev:
-            type: path
-            required: true
-            description: The device to put the filesystem on
-          type:
-            type: str
-            required: true
-            description: The type of filesystem to create
-          opts:
-            type: str
-            description: Additionnal arguments for mkfs
-          mountpoint:
-            type: path
-            description: Where to mount those filesystems (if anywhere)
-      disk_setup_btrfs_subvolumes:
-        type: list
-        elements: dict
-        options:
-          dev:
-            type: path
-            required: true
-            description: The device with a btrfs filesystem on
-          subvolumes:
+
+          options:
+            type: dict
+            options:
+              overridePartitionTables:
+                type: bool
+
+          partitionTables:
             type: list
             elements: dict
             options:
-              name:
+              device:
+                type: path
+                required: true
+              label:
                 type: str
                 required: true
-                description: The name/path of the subvolume
-              mountpoint:
+                example: gpt
+              partitions:
+                type: list
+                elements: dict
+                options:
+                  size:
+                    type: str
+                    required: true
+                  type:
+                    type: str
+                    required: true
+                  label:
+                    type: str
+                    required: true
+
+          fileSystems:
+            type: list
+            elements: dict
+            options:
+              devices:
+                type: list
+                elements: path
+                required: true
+              type:
+                type: str
+                required: true
+                example: btrfs
+              options:
+                type: str
+              subvolumes:
+                type: list
+                elements: str
+
+          mountPoints:
+            type: list
+            elements: dict
+            options:
+              device:
                 type: path
-                description: Where to mount the subvolume
+                required: true
+              type:
+                type: str
+                required: true
+              mountPoint:
+                type: path
+                required: true
+              options:
+                type: str
 

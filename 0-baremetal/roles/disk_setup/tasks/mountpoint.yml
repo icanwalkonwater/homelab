@@ -1,0 +1,15 @@
+# vim: ft=yaml.ansible
+---
+- name: Create mountpoint
+  ansible.builtin.file:
+    path: /mnt/{{ item.mountPoint }}
+    state: directory
+    mode: '0755'
+
+- name: Mount filesystem
+  ansible.posix.mount:
+    src: '{{ item.device }}'
+    path: /mnt/{{ item.mountPoint }}
+    fstype: '{{ item.type }}'
+    opts: '{{ item["options"] | default("") }}'
+    state: ephemeral

@@ -1,9 +1,0 @@
-namespace: homelab
-name: netinstall
-description: ''
-version: 1.0.0
-readme: ../../../../README.md
-authors:
-  - icanwalkonwater
-repository: https://github.com/icanwalkonwater/homelab
-

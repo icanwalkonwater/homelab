@@ -10,19 +10,21 @@
     vars = {
       testing = lib.specHelpers.validateHostsSchema (import ./vars_testing.nix inputsWithLib);
     };
+    inventories = {
+      testing = lib.ansible.mkInventory vars.testing;
+    };
+    writeInventory = system: inv: nixpkgs.legacyPackages.${system}.writeText "inventory.json" inv;
 
-    inventoryTesting = lib.ansible.mkInventory vars.testing;
-    inventoryDrv = system: inv: nixpkgs.legacyPackages.${system}.writeText "inventory.json" inv;
+    mkStageBaremetal = (import ./0-baremetal inputsWithLib);
 
-    baremetalDrv = (import ./0-baremetal inputsWithLib);
   in flutils.lib.eachDefaultSystem (system: rec {
     packages = rec {
-      inventory_testing = inventoryDrv system inventoryTesting;
-      baremetal = baremetalDrv system inventory_testing;
+      inventoryTesting = writeInventory system inventories.testing;
+      baremetal = mkStageBaremetal system inventoryTesting;
     };
 
     apps = {
-      test = flutils.lib.mkApp {
+      baremetal = flutils.lib.mkApp {
         drv = packages.baremetal;
       };
     };

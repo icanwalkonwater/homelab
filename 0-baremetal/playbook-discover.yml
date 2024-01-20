@@ -1,0 +1,33 @@
+# vim: ft=yaml.ansible
+---
+- name: Print unconfigured nodes informations
+  hosts: unconfigured
+  gather_facts: false
+  tasks:
+    - name: Wake up node
+      when: mac is defined
+      community.general.wakeonlan:
+        mac: '{{ mac }}'
+      delegate_to: localhost
+
+    - name: Wait for the node to be reachable
+      ansible.builtin.wait_for_connection:
+        connect_timeout: 1
+        timeout: 600
+
+    - name: Gather facts
+      ansible.builtin.setup:
+
+    - name: Gather devices information
+      ansible.builtin.command:
+        cmd: lsblk -a -o NAME,SIZE,TYPE,ID-LINK,PARTLABEL,PARTUUID,FSTYPE,LABEL,UUID,FSUSED,MOUNTPOINTS
+      changed_when: false
+      register: devices_pretty
+
+    - name: Print Architecture
+      ansible.builtin.debug:
+        var: ansible_facts.architecture
+
+    - name: Print devices
+      ansible.builtin.debug:
+        var: devices_pretty.stdout_lines

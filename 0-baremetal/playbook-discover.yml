@@ -1,7 +1,7 @@
 # vim: ft=yaml.ansible
 ---
 - name: Print unconfigured nodes informations
-  hosts: unconfigured
+  hosts: all
   gather_facts: false
   tasks:
     - name: Wake up node
@@ -21,7 +21,7 @@
     - name: Gather devices information
       ansible.builtin.command:
         cmd: lsblk -a -o NAME,SIZE,TYPE,ID-LINK,PARTLABEL,PARTUUID,FSTYPE,LABEL,UUID,FSUSED,MOUNTPOINTS
-      changed_when: false
+      changed_when: true
       register: devices_pretty
 
     - name: Print Architecture

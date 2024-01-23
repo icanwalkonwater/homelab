@@ -12,41 +12,41 @@ in {
 
       makeOptionalMac = host: lib.optionalAttrs (host ? mac) {mac = host.mac;};
 
-      makeOptionalParitionning = host:
-        if !(host.installer.createPartitions or false)
-        then {}
-        else if builtins.length (host.hardware.devices or []) == 0
-        then throw "Partition creation requested but `hardware.devices` is empty"
-        else let
-          devices = host.hardware.devices;
-
-          makeSfdiskScript = label: partitions: ''
-            label: ${label}
-            ${builtins.concatStringsSep "\n" (map ({
-              size,
-              label,
-              type ? "linux",
-            }: ''size=${size}, name=${label}, type=${type}'')
-            partitions)}
-          '';
-        in {
-          partitions = map ({
-            device,
-            label ? "gpt",
-            partitions ? [],
-          }:
-            if label != "gpt"
-            then throw "Only `gpt` partitions are supported"
-            else if builtins.length partitions == 0
-            then throw "No partitions specified, this is likely a bug with you"
-            else {
-              inherit device;
-              wipe_before = host.installer.overridePartitions or false;
-              sfdisk_script = makeSfdiskScript label partitions;
-              creates = map ({label, ...}: "/dev/disk/by-partlabel/${label}") partitions;
-            })
-          devices;
-        };
+      # makeOptionalParitionning = host:
+      #   if !(host.installer.createPartitions or false)
+      #   then {}
+      #   else if builtins.length (host.hardware.devices or []) == 0
+      #   then throw "Partition creation requested but `hardware.devices` is empty"
+      #   else let
+      #     devices = host.hardware.devices;
+      #
+      #     makeSfdiskScript = label: partitions: ''
+      #       label: ${label}
+      #       ${builtins.concatStringsSep "\n" (map ({
+      #         size,
+      #         label,
+      #         type ? "linux",
+      #       }: ''size=${size}, name=${label}, type=${type}'')
+      #       partitions)}
+      #     '';
+      #   in {
+      #     partitions = map ({
+      #       device,
+      #       label ? "gpt",
+      #       partitions ? [],
+      #     }:
+      #       if label != "gpt"
+      #       then throw "Only `gpt` partitions are supported"
+      #       else if builtins.length partitions == 0
+      #       then throw "No partitions specified, this is likely a bug with you"
+      #       else {
+      #         inherit device;
+      #         wipe_before = host.installer.overridePartitions or false;
+      #         sfdisk_script = makeSfdiskScript label partitions;
+      #         creates = map ({label, ...}: "/dev/disk/by-partlabel/${label}") partitions;
+      #       })
+      #     devices;
+      #   };
 
       makeOptionalFormatting = host:
         if !(host.installer.createFilesystems or false)
@@ -91,15 +91,23 @@ in {
           subvolumes = lib.flatten (map asBtrfsSubvolumes filesystems);
         };
 
-      hostConfig = lib.pipe hosts [
+      # hostConfig = lib.pipe hosts [
+      #   (builtins.mapAttrs (
+      #     name: host:
+      #       {ansible_host = host.ip;}
+      #       // (makeOptionalMac host)
+      #       // (makeOptionalParitionning host)
+      #       // (makeOptionalFormatting host)
+      #   ))
+      # ];
+      allHosts = lib.pipe hosts [
         (builtins.mapAttrs (
-          name: host:
-            {ansible_host = host.ip;}
-            // (makeOptionalMac host)
-            // (makeOptionalParitionning host)
-            // (makeOptionalFormatting host)
+          name: host: (lib.filterAttrs (key: v: builtins.elem key ["ansible_host" "partitions" "nixosConfiguration"]) host)
         ))
       ];
+
+      unconfiguredHosts = lib.filterAttrs (name: host: !host ? nixosConfiguration) allHosts;
+      configuredHosts = lib.filterAttrs (name: host: host ? nixosConfiguration) allHosts;
     in
       pkgs.writeTextFile {
         name = "inventory.yml";
@@ -108,7 +116,8 @@ in {
             ansible_user = "ansible";
             ansible_ssh_private_key_file = self'.packages.ansibleSshPrivateKey;
           };
-          unconfigured.hosts = hostConfig;
+          unconfigured.hosts = unconfiguredHosts;
+          configured.hosts = configuredHosts;
         };
       };
 

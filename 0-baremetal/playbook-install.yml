@@ -1,0 +1,25 @@
+# vim: ft=yaml.ansible
+---
+- name: Install NixOS
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Wake up samurai
+      when: mac is defined
+      community.general.wakeonlan:
+        mac: '{{ mac }}'
+      delegate_to: localhost
+
+    - name: Wait for the node to be reachable
+      ansible.builtin.wait_for_connection:
+
+    - name: Gather facts
+      ansible.builtin.setup:
+
+    - name: Partitioning
+      when: partitions | length > 0
+      ansible.builtin.include_tasks:
+        file: ./tasks-partitioning.yml
+      loop: "{{ partitions }}"
+      loop_control:
+        loop_var: spec

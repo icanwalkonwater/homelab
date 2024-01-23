@@ -1,0 +1,15 @@
+# vim: ft=yaml.ansible
+---
+- name: Stat resulting partitions
+  ansible.builtin.stat:
+    path: '{{ item }}'
+  loop: '{{ spec.creates }}'
+  register: partitions_stat
+
+- name: Partition disk
+  become: true
+  when: partitions_stat.results | map(attribute="stat.exists") | select("true") | length == 0
+  ansible.builtin.command:
+    cmd: sfdisk --wipe-partitions always {{ spec.device }}
+    stdin: '{{ spec.sfdiskScript }}'
+    creates:

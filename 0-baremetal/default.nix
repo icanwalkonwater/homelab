@@ -134,13 +134,23 @@ in {
         '';
       };
 
-    packages.discoverUnconfiguredHosts = pkgs.writeShellApplication {
+    packages.printHostsConfig = pkgs.writeShellApplication {
       name = "discover-unconfigured-hosts-properties";
       runtimeInputs = [pkgs.ansible];
       text = ''
         export LC_ALL="C.UTF-8"
         export ANSIBLE_HOST_KEY_CHECKING=False
         ansible-playbook ${./playbook-discover.yml} -i ${self'.packages.ansibleInventory}
+      '';
+    };
+
+    packages.baremetalInstall = pkgs.writeShellApplication {
+      name = "baremetal-install";
+      runtimeInputs = [pkgs.ansible];
+      text = ''
+        export LC_ALL="C.UTF-8"
+        export ANSIBLE_HOST_KEY_CHECKING=False
+        ansible-playbook ${./playbook-install.yml} -i ${self'.packages.ansibleInventory}
       '';
     };
   };

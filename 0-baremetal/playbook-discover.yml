@@ -21,8 +21,15 @@
     - name: Gather devices information
       ansible.builtin.command:
         cmd: lsblk -a -o NAME,SIZE,TYPE,ID-LINK,PARTLABEL,PARTUUID,FSTYPE,LABEL,UUID,FSUSED,MOUNTPOINTS
-      changed_when: true
+        creates:
       register: devices_pretty
+
+    - name: Gather hardware configuration
+      become: true
+      ansible.builtin.command:
+        cmd: nixos-generate-config --no-filesystems --show-hardware-config
+        creates:
+      register: hardware_config
 
     - name: Print Architecture
       ansible.builtin.debug:
@@ -31,3 +38,7 @@
     - name: Print devices
       ansible.builtin.debug:
         var: devices_pretty.stdout_lines
+
+    - name: Print hardware configuration
+      ansible.builtin.debug:
+        var: hardware_config.stdout_lines

@@ -33,7 +33,63 @@ in rec {
     }
   ];
 
-  hardwareConfiguration = {};
+  chrootMounts =
+    (map (mount: mount // {path = "/mnt${mount.path}";}) rootMounts)
+    ++ [
+      {
+        device = "/dev/disk/by-label/bootloader";
+        path = "/mnt/boot";
+        type = "vfat";
+      }
+    ];
+
+  rootMounts = let
+    subvols = [
+      {
+        name = "/@";
+        path = "/";
+      }
+      {
+        name = "/@nix";
+        path = "/nix";
+      }
+      {
+        name = "/@log";
+        path = "/var/log";
+      }
+      {
+        name = "/@home";
+        path = "/home";
+      }
+      {
+        name = "/@root";
+        path = "/root";
+      }
+    ];
+  in
+    map ({
+      name,
+      path,
+    }: {
+      device = "/dev/disk/by-label/nixos";
+      inherit path;
+      type = "btrfs";
+      options = ["subvol=${name}"];
+    })
+    subvols;
+
+  hardwareConfigurationModule = {
+    config,
+    lib,
+    pkgs,
+    modulesPath,
+    ...
+  }: {
+    imports = [(modulesPath + "/profiles/qemu-guest.nix")];
+
+    boot.initrd.availableKernelModules = ["ahci" "xhci_pci" "virtio_pci" "virtio_scssi" "sd_mod"];
+    boot.kernelModules = ["kvm-intel"];
+  };
 
   nixosConfiguration = "uwu";
 

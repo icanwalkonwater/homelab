@@ -31,3 +31,11 @@
       loop: '{{ filesystems }}'
       loop_control:
         loop_var: spec
+
+    - name: Mount for install
+      when: chrootMounts | default([]) | length > 0
+      ansible.builtin.include_tasks:
+        file: '{{ playbook_dir }}/tasks-mounts.yml'
+      loop: '{{ chrootMounts }}'
+      loop_control:
+        loop_var: spec

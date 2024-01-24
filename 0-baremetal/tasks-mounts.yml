@@ -1,0 +1,10 @@
+# vim: ft=yaml.ansible
+---
+- name: Mount filesystem
+  become: true
+  ansible.posix.mount:
+    src: '{{ spec.device }}'
+    path: '{{ spec.path }}'
+    fstype: '{{ spec.type }}'
+    opts: '{{ spec.options | default([]) | join(" ") }}'
+    state: ephemeral

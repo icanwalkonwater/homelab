@@ -105,9 +105,6 @@ in {
           name: host: (lib.filterAttrs (key: v: builtins.elem key ["ansible_host" "partitions" "filesystems" "chrootMounts" "nixosConfiguration"]) host)
         ))
       ];
-
-      unconfiguredHosts = lib.filterAttrs (name: host: !host ? nixosConfiguration) allHosts;
-      configuredHosts = lib.filterAttrs (name: host: host ? nixosConfiguration) allHosts;
     in
       pkgs.writeTextFile {
         name = "inventory.yml";
@@ -116,8 +113,7 @@ in {
             ansible_user = "ansible";
             ansible_ssh_private_key_file = self'.packages.ansibleSshPrivateKey;
           };
-          unconfigured.hosts = unconfiguredHosts;
-          configured.hosts = configuredHosts;
+          all.hosts = allHosts;
         };
       };
 

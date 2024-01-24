@@ -134,13 +134,13 @@ in {
         '';
       };
 
-    packages.printHostsConfig = pkgs.writeShellApplication {
+    packages.baremetalDiscoverHosts = pkgs.writeShellApplication {
       name = "discover-unconfigured-hosts-properties";
       runtimeInputs = [pkgs.ansible];
       text = ''
         export LC_ALL="C.UTF-8"
         export ANSIBLE_HOST_KEY_CHECKING=False
-        ansible-playbook ${./playbook-discover.yml} -i ${self'.packages.ansibleInventory}
+        ansible-playbook ${./.}/playbook-discover.yml -i ${self'.packages.ansibleInventory}
       '';
     };
 
@@ -150,7 +150,7 @@ in {
       text = ''
         export LC_ALL="C.UTF-8"
         export ANSIBLE_HOST_KEY_CHECKING=False
-        ansible-playbook ${./playbook-install.yml} -i ${self'.packages.ansibleInventory}
+        ansible-playbook ${./.}/playbook-install.yml -i ${self'.packages.ansibleInventory}
       '';
     };
   };

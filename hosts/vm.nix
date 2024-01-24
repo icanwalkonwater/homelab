@@ -17,15 +17,25 @@ in rec {
     }
   ];
 
-  nixosConfiguration = "uwu";
+  filesystems = [
+    {
+      device = "/dev/disk/by-partlabel/boot-uefi";
+      type = "vfat";
+      options = ["-F" "32" "-n" "bootloader"];
+      creates = ["/dev/disk/by-label/bootloader"];
+    }
+    {
+      device = "/dev/disk/by-partlabel/linux";
+      type = "btrfs";
+      options = ["--label" "nixos"];
+      creates = ["/dev/disk/by-label/nixos"];
+      subvolumes = ["/@" "/@nix" "/@log" "/@home" "/@root" "/@snapshots"];
+    }
+  ];
 
-  # filesystems = [
-  #   {
-  #     device = "/dev/disk/by-partlabel/boot-uefi";
-  #     fstype = "vfat";
-  #     options = ["-F" "32" "-n" "bootloader"];
-  #   }
-  # ];
+  hardwareConfiguration = {};
+
+  nixosConfiguration = "uwu";
 
   # hardware = {
   #   devices = [(common.rootDeviceUefiBtrfs // {device = "/dev/disk/by-id/ata-QEMU_HARDDISK_QM00001";})];

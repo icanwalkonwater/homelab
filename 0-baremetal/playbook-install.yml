@@ -19,7 +19,15 @@
     - name: Partitioning
       when: partitions | length > 0
       ansible.builtin.include_tasks:
-        file: ./tasks-partitioning.yml
-      loop: "{{ partitions }}"
+        file: '{{ playbook_dir }}/tasks-partitioning.yml'
+      loop: '{{ partitions }}'
+      loop_control:
+        loop_var: spec
+
+    - name: Formatting
+      when: filesystems | default([]) | length > 0
+      ansible.builtin.include_tasks:
+        file: '{{ playbook_dir }}/tasks-formatting.yml'
+      loop: '{{ filesystems }}'
       loop_control:
         loop_var: spec

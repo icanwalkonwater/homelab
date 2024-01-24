@@ -1,0 +1,32 @@
+# vim: ft=yaml.ansible
+---
+- name: Stat resulting filesystems
+  ansible.builtin.stat:
+    path: '{{ item }}'
+  loop: '{{ spec.creates }}'
+  register: filesystem_stat
+
+- name: Create normal filesystem
+  become: true
+  when: spec.device is defined and spec.type != "btrfs"
+  community.general.filesystem:
+    dev: '{{ spec.device }}'
+    fstype: '{{ spec.type }}'
+    opts: '{{ spec.options | default([]) | join(" ") }}'
+    state: present
+
+- name: Create BTRFS filesystem
+  become: true
+  when: spec.type == "btrfs" and (filesystem_stat.results | map(attribute="stat.exists") | select("true") | length == 0)
+  ansible.builtin.command:
+    cmd: mkfs.btrfs {{ spec.options | default([]) | join(" ") }} {{ spec.devices | default([spec.device]) | join(" ") }}
+
+- name: Create BTRFS subvolumes
+  become: true
+  when: spec.type == "btrfs" and (spec.subvolumes | default([]) | length > 0)
+  community.general.btrfs_subvolume:
+    automount: true
+    filesystem_device: '{{ spec.creates | first }}'
+    name: '{{ item }}'
+    state: present
+  loop: '{{ spec.subvolumes }}'

@@ -102,7 +102,7 @@ in {
       # ];
       allHosts = lib.pipe hosts [
         (builtins.mapAttrs (
-          name: host: (lib.filterAttrs (key: v: builtins.elem key ["ansible_host" "partitions" "nixosConfiguration"]) host)
+          name: host: (lib.filterAttrs (key: v: builtins.elem key ["ansible_host" "partitions" "filesystems" "chrootMounts" "nixosConfiguration"]) host)
         ))
       ];
 

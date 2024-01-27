@@ -6,6 +6,8 @@
   nixpkgs = inputs.nixpkgs;
   lib = nixpkgs.lib;
 in {
+  imports = [./inventory.nix];
+
   # NixOS instance that will be delivered via PXE
   flake.nixosConfigurations.baremetalInstaller = lib.nixosSystem {
     system = "x86_64-linux";
@@ -114,7 +116,7 @@ in {
       ${pkgs.openssh}/bin/ssh-keygen -f ${self'.packages.ansibleSshPrivateKey} -y > "$out"
     '';
 
-    packages.pxeServer = let
+    packages.baremetalPxeServer = let
       installer = self.nixosConfigurations.baremetalInstaller;
       netbootFiles = installer.config.system.build.netbootFiles;
       cmdline = installer.config.system.build.cmdline;
@@ -135,12 +137,12 @@ in {
       };
 
     packages.baremetalDiscoverHosts = pkgs.writeShellApplication {
-      name = "discover-unconfigured-hosts-properties";
+      name = "discover-hosts";
       runtimeInputs = [pkgs.ansible];
       text = ''
         export LC_ALL="C.UTF-8"
         export ANSIBLE_HOST_KEY_CHECKING=False
-        ansible-playbook ${./.}/playbook-discover.yml -i ${self'.packages.ansibleInventory}
+        ansible-playbook ${./.}/playbook-discover.yml -i ${self'.packages.baremetalAnsibleInventory}
       '';
     };
 
@@ -150,7 +152,7 @@ in {
       text = ''
         export LC_ALL="C.UTF-8"
         export ANSIBLE_HOST_KEY_CHECKING=False
-        ansible-playbook ${./.}/playbook-install.yml -i ${self'.packages.ansibleInventory}
+        ansible-playbook ${./.}/playbook-install.yml -i ${self'.packages.baremetalAnsibleInventory}
       '';
     };
   };

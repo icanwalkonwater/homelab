@@ -1,6 +1,4 @@
-let
-  common = import ./common.nix;
-in rec {
+rec {
   hostname = "homelab-vm-staging";
   ip = "192.168.122.181";
   ansible_host = ip;
@@ -77,30 +75,4 @@ in rec {
       options = ["subvol=${name}"];
     })
     subvols;
-
-  hardwareConfigurationModule = {
-    config,
-    lib,
-    pkgs,
-    modulesPath,
-    ...
-  }: {
-    imports = [(modulesPath + "/profiles/qemu-guest.nix")];
-
-    boot.initrd.availableKernelModules = ["ahci" "xhci_pci" "virtio_pci" "virtio_scssi" "sd_mod"];
-    boot.kernelModules = ["kvm-intel"];
-  };
-
-  nixosConfiguration = "uwu";
-
-  # hardware = {
-  #   devices = [(common.rootDeviceUefiBtrfs // {device = "/dev/disk/by-id/ata-QEMU_HARDDISK_QM00001";})];
-  #
-  #   filesystems = [
-  #     common.uefiFilesystem
-  #     common.rootBtrfsFilesystem
-  #   ];
-  #
-  #   mountpoints = [] ++ common.bootloaderMountpoint ++ common.rootBtrfsMountpoints;
-  # };
 }

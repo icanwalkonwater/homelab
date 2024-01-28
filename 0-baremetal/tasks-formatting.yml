@@ -19,7 +19,7 @@
   become: true
   when: spec.type == "btrfs" and (filesystem_stat.results | map(attribute="stat.exists") | select("true") | length == 0)
   ansible.builtin.command:
-    cmd: mkfs.btrfs {{ spec.options | default([]) | join(" ") }} {{ spec.devices | default([spec.device]) | join(" ") }}
+    cmd: mkfs.btrfs --force {{ spec.options | default([]) | join(" ") }} {{ spec.devices | default([spec.device]) | join(" ") }}
 
 - name: Create BTRFS subvolumes
   become: true

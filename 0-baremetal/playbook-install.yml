@@ -43,5 +43,5 @@
     - name: Install NixOS
       become: true
       ansible.builtin.command:
-        cmd: nixos-install --verbose --flake {{ nixos_configuration_flake_url }}
+        cmd: nixos-install --no-root-passwd --root /mnt --flake {{ nixos_configuration_flake_url }}
         creates:

@@ -18,7 +18,9 @@ in {
       ];
     };
 
-    nixosModules.vm = {...}: {
+    nixosModules.vm = {modulesPath, ...}: {
+      imports = [(modulesPath + "/profiles/minimal.nix")];
+
       networking.hostName = "vm";
       networking.networkmanager.enable = true;
 

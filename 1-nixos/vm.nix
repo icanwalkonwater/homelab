@@ -11,6 +11,8 @@ in {
         vmHardwareConfiguration
         vmFilesystems
         bootloaderSystemd
+        doas
+        sshd
         userLucas
         vm
       ];

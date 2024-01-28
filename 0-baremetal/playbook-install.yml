@@ -39,3 +39,8 @@
       loop: '{{ chrootMounts }}'
       loop_control:
         loop_var: spec
+
+    - name: Install NixOS
+      ansible.builtin.command:
+        cmd: nixos-install --verbose --flake {{ nixos_configuration_flake_url }}
+        creates:

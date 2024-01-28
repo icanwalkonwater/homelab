@@ -23,6 +23,7 @@ in {
             vars = {
               ansible_user = "ansible";
               ansible_ssh_private_key_file = self'.packages.ansibleSshPrivateKey;
+              nixos_configuration_flake_url = "github:icanwalkonwater/homelab#vm";
             };
           };
         };

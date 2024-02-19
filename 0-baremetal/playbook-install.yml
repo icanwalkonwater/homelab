@@ -40,6 +40,9 @@
       loop_control:
         loop_var: spec
 
+    - name: Press something to perform installation
+      ansible.builtin.pause:
+
     - name: Install NixOS
       become: true
       ansible.builtin.command:

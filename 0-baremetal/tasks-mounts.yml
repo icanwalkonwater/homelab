@@ -1,5 +1,12 @@
 # vim: ft=yaml.ansible
 ---
+- name: Umount if needed
+  become: true
+  ansible.posix.mount:
+    src: '{{ spec.device }}'
+    path: '{{ spec.path }}'
+    state: unmounted
+
 - name: Mount filesystem
   become: true
   ansible.posix.mount:

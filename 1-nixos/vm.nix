@@ -18,11 +18,20 @@ in {
       ];
     };
 
-    nixosModules.vm = {modulesPath, ...}: {
-      imports = [(modulesPath + "/profiles/minimal.nix")];
+    nixosModules.vm = {
+      modulesPath,
+      lib,
+      ...
+    }: {
+      imports = [
+        (modulesPath + "/profiles/minimal.nix")
+        (modulesPath + "/profiles/headless.nix")
+      ];
 
       networking.hostName = "vm";
       networking.networkmanager.enable = true;
+      networking.networkmanager.plugins = lib.mkForce [];
+      networking.firewall.enable = false;
 
       time.timeZone = "Europe/Paris";
 
@@ -31,8 +40,8 @@ in {
     };
 
     nixosModules.vmHardwareConfiguration = {
-      lib,
       modulesPath,
+      lib,
       ...
     }: {
       imports = [(modulesPath + "/profiles/qemu-guest.nix")];

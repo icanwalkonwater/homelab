@@ -2,6 +2,12 @@
   imports = [./vm.nix];
 
   flake.nixosModules = {
+    enableFlakes = {lib, ...}: {
+      config = {
+        nix.settings.experimental-features = lib.mkDefault ["nix-command" "flakes"];
+      };
+    };
+
     bootloaderSystemd = {...}: {
       boot.loader.systemd-boot.enable = true;
       boot.loader.efi.canTouchEfiVariables = true;

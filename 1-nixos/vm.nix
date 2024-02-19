@@ -12,6 +12,7 @@ in {
         vmHardwareConfiguration
         vmFilesystems
         vmDebloat
+        enableFlakes
         bootloaderSystemd
         doas
         sshd

@@ -24,14 +24,14 @@ in {
       ...
     }: {
       imports = [
-        (modulesPath + "/profiles/minimal.nix")
+        # (modulesPath + "/profiles/minimal.nix")
         # (modulesPath + "/profiles/headless.nix")
       ];
 
       networking.hostName = "vm";
-      networking.networkmanager.enable = true;
-      networking.networkmanager.plugins = lib.mkForce [];
-      networking.firewall.enable = false;
+      # networking.networkmanager.enable = true;
+      # networking.networkmanager.plugins = lib.mkForce [];
+      # networking.firewall.enable = false;
 
       time.timeZone = "Europe/Paris";
 

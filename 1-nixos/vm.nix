@@ -39,13 +39,13 @@ in {
       console.keyMap = "fr";
     };
 
-    nixosModules.vmDebloat = {...}: {
-      appstream.enable = false;
-      boot.bcache.enable = false;
+    nixosModules.vmDebloat = {lib, ...}: {
+      appstream.enable = lib.mkForce false;
+      boot.bcache.enable = lib.mkForce false;
       networking.networkmanager.plugins = lib.mkForce [];
-      programs.command-not-found.enable = false;
-      programs.nano.enable = false;
-      services.lvm.enable = false;
+      programs.command-not-found.enable = lib.mkForce false;
+      programs.nano.enable = lib.mkForce false;
+      services.lvm.enable = lib.mkForce false;
     };
 
     nixosModules.vmHardwareConfiguration = {

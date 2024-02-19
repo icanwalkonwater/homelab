@@ -10,6 +10,7 @@ in {
       modules = with self.nixosModules; [
         vmHardwareConfiguration
         vmFilesystems
+        vmDebloat
         bootloaderSystemd
         doas
         sshd
@@ -30,13 +31,21 @@ in {
 
       networking.hostName = "vm";
       networking.networkmanager.enable = true;
-      networking.networkmanager.plugins = lib.mkForce [];
       networking.firewall.enable = false;
 
       time.timeZone = "Europe/Paris";
 
       i18n.defaultLocale = "en_US.UTF-8";
       console.keyMap = "fr";
+    };
+
+    nixosModules.vmDebloat = {...}: {
+      appstream.enable = false;
+      boot.bcache.enable = false;
+      networking.networkmanager.plugins = lib.mkForce [];
+      programs.command-not-found.enable = false;
+      programs.nano.enable = false;
+      services.lvm.enable = false;
     };
 
     nixosModules.vmHardwareConfiguration = {

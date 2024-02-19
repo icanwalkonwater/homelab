@@ -7,6 +7,7 @@
 in {
   flake = {
     nixosConfigurations.vm = lib.nixosSystem {
+      specialArgs = inputs;
       modules = with self.nixosModules; [
         vmHardwareConfiguration
         vmFilesystems

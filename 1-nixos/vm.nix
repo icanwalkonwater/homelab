@@ -24,8 +24,8 @@ in {
       ...
     }: {
       imports = [
-        # (modulesPath + "/profiles/minimal.nix")
-        # (modulesPath + "/profiles/headless.nix")
+        (modulesPath + "/profiles/minimal.nix")
+        (modulesPath + "/profiles/headless.nix")
       ];
 
       networking.hostName = "vm";

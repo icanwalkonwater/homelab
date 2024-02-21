@@ -42,14 +42,11 @@ in {
     };
 
     nixosModules.vmDebloat = {lib, ...}: {
-      config = {
-        appstream.enable = lib.mkForce false;
-        boot.bcache.enable = lib.mkForce false;
-        networking.networkmanager.plugins = lib.mkForce [];
-        programs.command-not-found.enable = lib.mkForce false;
-        programs.nano.enable = lib.mkForce false;
-        services.lvm.enable = lib.mkForce false;
-      };
+      appstream.enable = false;
+      networking.networkmanager.plugins = lib.mkForce [];
+      programs.command-not-found.enable = false;
+      programs.nano.enable = false;
+      # services.lvm.enable = false;
     };
 
     nixosModules.vmHardwareConfiguration = {

@@ -33,7 +33,7 @@ in {
       ];
 
       networking.hostName = "vm";
-      networking.networkmanager.enable = true;
+      # networking.networkmanager.enable = true;
       networking.firewall.enable = false;
 
       time.timeZone = "Europe/Paris";

@@ -51,6 +51,11 @@ in {
       programs.command-not-found.enable = false;
       programs.nano.enable = false;
       services.lvm.enable = false;
+
+      # Replace nscd by systemd-resolved
+      services.nscd.enable = false;
+      system.nssModules = lib.mkForce [];
+      services.resolved.enable = true;
     };
 
     nixosModules.vmHardwareConfiguration = {

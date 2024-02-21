@@ -39,7 +39,7 @@
       };
     };
 
-    k3sMaster = {...}: {
+    k3sMaster = {pkgs, ...}: {
       services.k3s = {
         enable = true;
         role = "server";
@@ -53,6 +53,8 @@
           "--disable=traefik"
         ];
       };
+
+      environment.systemPackages = [pkgs.wireguard-tools];
     };
   };
 }

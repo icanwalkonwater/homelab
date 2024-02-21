@@ -17,6 +17,7 @@ in {
         doas
         sshd
         userLucas
+        k3sMaster
         vm
       ];
     };
@@ -33,7 +34,6 @@ in {
       ];
 
       networking.hostName = "vm";
-      # networking.networkmanager.enable = true;
       networking.firewall.enable = false;
 
       time.timeZone = "Europe/Paris";

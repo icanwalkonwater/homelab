@@ -38,5 +38,11 @@
         ];
       };
     };
+
+    k3sMaster = {...}: {
+      services.k3s = {
+        enable = true;
+      };
+    };
   };
 }

@@ -24,6 +24,7 @@ in {
     nixosModules.vm = {
       modulesPath,
       lib,
+      pkgs,
       ...
     }: {
       imports = [
@@ -39,14 +40,17 @@ in {
 
       i18n.defaultLocale = "en_US.UTF-8";
       console.keyMap = "fr";
+
+      environment.systemPackages = [pkgs.htop];
     };
 
     nixosModules.vmDebloat = {lib, ...}: {
       appstream.enable = false;
+      boot.bcache.enable = false;
       networking.networkmanager.plugins = lib.mkForce [];
       programs.command-not-found.enable = false;
       programs.nano.enable = false;
-      # services.lvm.enable = false;
+      services.lvm.enable = false;
     };
 
     nixosModules.vmHardwareConfiguration = {

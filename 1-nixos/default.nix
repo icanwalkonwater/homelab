@@ -46,8 +46,10 @@
         clusterInit = true;
         extraFlags = toString [
           "--secrets-encryption"
-          # "--cluster-cidr=10.42.0.0/16,2001:cafe:42::/56"
-          # "--service-cidr=10.43.0.0/16,2001:cafe:43::/112"
+          "--cluster-cidr=10.42.0.0/16,2001:cafe:42::/56"
+          "--service-cidr=10.43.0.0/16,2001:cafe:43::/112"
+          # Workaround to prioritize IPv6 traffic
+          "--kubelet-arg='node-ip=::'"
           "--flannel-backend=wireguard-native"
           "--disable-cloud-controller"
           "--disable=traefik"

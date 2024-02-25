@@ -32,6 +32,12 @@ spec:
         fsGroup: 472
         supplementalGroups:
           - 0
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop: ["ALL"]
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: grafana
           image: grafana/grafana:latest

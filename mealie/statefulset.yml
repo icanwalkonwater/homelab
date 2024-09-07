@@ -24,6 +24,8 @@ spec:
               value: Europe/Paris
             - name: DB_ENGINE
               value: sqlite
+            - name: BASE_URL
+              value: mealie.homelab.icanwalkonwater.dev
           ports:
             - containerPort: 9000
               name: http
@@ -32,8 +34,8 @@ spec:
               mountPath: /app/data
           resources:
             limits:
-              cpu: 1000m
-              memory: 1024Mi
+              cpu: 500m
+              memory: 512Mi
 
   persistentVolumeClaimRetentionPolicy:
     whenDeleted: Retain

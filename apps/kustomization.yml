@@ -6,3 +6,4 @@ namespace: argocd
 resources:
 - homelab.yml
 - argocd.yml
+- ingress-nginx.yml

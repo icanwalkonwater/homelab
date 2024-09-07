@@ -5,8 +5,4 @@ kind: Kustomization
 resources:
   - statefulset.yml
   - service.yml
-
-configMapGenerator:
-  - name: prometheus-cm
-    files:
-      - data/prometheus.yml
+  - ingress.yml

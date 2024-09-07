@@ -4,7 +4,6 @@ kind: Kustomization
 
 namespace: argocd
 resources:
-- namespace.yml
 - bootstrap.yml
 - argocd.yml
 - local-path-provisioner.yml

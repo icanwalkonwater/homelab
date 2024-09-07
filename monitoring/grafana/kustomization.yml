@@ -1,0 +1,14 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- deployment.yml
+- service.yml
+- ingress.yml
+
+configMapGenerator:
+- name: grafana-config-cm
+  files:
+    - data/datasource-prometheus.yml
+    - data/dashboard.yml
+    - data/dashboard.json

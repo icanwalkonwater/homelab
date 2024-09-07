@@ -4,7 +4,7 @@ kind: Kustomization
 
 namespace: argocd
 resources:
-- homelab.yml
+- bootstrap.yml
 - argocd.yml
 - local-path-provisioner.yml
 - ingress-nginx.yml

@@ -45,6 +45,9 @@ spec:
                 path: prometheus.yml
       serviceAccountName: prometheus
 
+  persistentVolumeClaimRetentionPolicy:
+    whenDeleted: Retain
+    whenScaled: Retain
   volumeClaimTemplates:
     - metadata:
         name: storage

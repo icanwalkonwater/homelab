@@ -32,8 +32,8 @@ spec:
               mountPath: /app/data
           resources:
             limits:
-              cpu: 100m
-              memory: 200Mi
+              cpu: 1000m
+              memory: 1024Mi
 
   persistentVolumeClaimRetentionPolicy:
     whenDeleted: Retain

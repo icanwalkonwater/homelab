@@ -23,4 +23,4 @@ spec:
           service:
             name: kanidm
             port:
-              number: 8443
+              name: https

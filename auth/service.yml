@@ -11,6 +11,6 @@ spec:
     app.kubernetes.io/name: kanidm
   ports:
     - name: https
-      port: 8443
+      port: 443
       protocol: TCP
       targetPort: https

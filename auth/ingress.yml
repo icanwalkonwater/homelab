@@ -10,6 +10,7 @@ metadata:
     nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
 spec:
   ingressClassName: nginx
+  clusterIP: None
   tls:
   - hosts:
     - auth.homelab.icanwalkonwater.dev

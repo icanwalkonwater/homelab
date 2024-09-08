@@ -30,6 +30,8 @@ spec:
               value: /data/tls/tls.crt
             - name: KANIDM_TLS_KEY
               value: /data/tls/tls.key
+            - name: KANIDM_LOG_LEVEL
+              value: debug
           ports:
             - containerPort: 8443
               name: https

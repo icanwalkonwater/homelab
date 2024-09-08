@@ -11,4 +11,5 @@ resources:
 - cert-manager.yml
 - cert-manager-issuers.yml
 - monitoring.yml
+- auth.yml
 - mealie.yml

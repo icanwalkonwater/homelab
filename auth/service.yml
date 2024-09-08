@@ -30,3 +30,4 @@ spec:
       port: 443
       protocol: TCP
       targetPort: https
+      nodePort: 30123

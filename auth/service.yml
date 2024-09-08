@@ -10,6 +10,7 @@ spec:
   selector:
     app.kubernetes.io/name: kanidm
   ports:
-    - port: 8443
+    - name: https
+      port: 8443
       protocol: TCP
       targetPort: https

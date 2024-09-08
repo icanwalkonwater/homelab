@@ -21,6 +21,6 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: kanidm-server
+            name: kanidm
             port:
               number: 8443

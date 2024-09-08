@@ -14,4 +14,3 @@ spec:
       port: 8443
       protocol: TCP
       targetPort: https
-  externalTrafficPolicy: Local

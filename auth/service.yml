@@ -11,23 +11,6 @@ spec:
     app.kubernetes.io/name: kanidm
   ports:
     - name: https
-      port: 443
+      port: 8443
       protocol: TCP
       targetPort: https
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: kanidm-node
-  labels:
-    app.kubernetes.io/name: kanidm-node
-spec:
-  type: NodePort
-  selector:
-    app.kubernetes.io/name: kanidm
-  ports:
-    - name: https
-      port: 443
-      protocol: TCP
-      targetPort: https
-      nodePort: 30123

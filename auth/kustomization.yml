@@ -7,4 +7,3 @@ resources:
   - statefulset.yml
   - service.yml
   - ingress.yml
-  - network-policy.yml

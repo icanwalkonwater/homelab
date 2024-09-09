@@ -33,9 +33,24 @@ spec:
                 subdomain: auth
           authentication_backend:
             ldap:
-              enabled: false
-            file:
               enabled: true
+              implementation: custom
+              address: ldap://lldap:3890
+              timeout: 5s
+              start_tls: false
+              base_dn: dc=homelab,dc=icanwalkonwater,dc=dev
+              additional_users_dn: OU=people
+              users_filter: (&({username_attribute}={input})(objectClass=person))
+              additional_groups_dn: OU=groups
+              groups_filter: (member={dn})
+              user: UID=authelia,OU=people,DC=homelab,DC=icanwalkonwater,DC=dev
+              password: SUPER_COMPLEX_PASSWORD
+              attributes:
+                distinguished_name: distinguishedName
+                username: uid
+                mail: mail
+                member_of: memberOf
+                group_name: cn
           storage:
             local:
               enabled: true

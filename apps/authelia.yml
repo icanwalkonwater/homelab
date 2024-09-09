@@ -29,8 +29,8 @@ spec:
           enable: true
           session:
             cookies:
-              domain: homelab.icanwalkonwater.dev
-              subdomain: auth
+              - domain: homelab.icanwalkonwater.dev
+                subdomain: auth
   syncPolicy:
     automated:
       prune: true

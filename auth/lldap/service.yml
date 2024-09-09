@@ -9,11 +9,14 @@ spec:
     app.kubernetes.io/name: lldap
   ports:
     - name: ldap
+      port: 3890
       protocol: TCP
       targetPort: ldap
     - name: ldaps
+      port: 6360
       protocol: TCP
       targetPort: ldaps
     - name: http
+      port: 17170
       protocol: TCP
       targetPort: http

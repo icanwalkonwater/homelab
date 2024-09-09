@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: lldap
-        image: ghcr.io/lldap/lldap:2020-09-08-alpine-rootless
+        image: ghcr.io/lldap/lldap:2024-09-08-alpine-rootless
         env:
           - name: TZ
             value: Europe/Paris

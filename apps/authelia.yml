@@ -31,6 +31,14 @@ spec:
             cookies:
               - domain: homelab.icanwalkonwater.dev
                 subdomain: auth
+          authentification_backend:
+            ldap:
+              enabled: false
+            file:
+              enabled: true
+          storage:
+            local:
+              enabled: true
   syncPolicy:
     automated:
       prune: true

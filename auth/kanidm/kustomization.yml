@@ -4,4 +4,6 @@ kind: Kustomization
 
 namespace: auth
 resources:
-  - kanidm
+  - statefulset.yml
+  - service.yml
+  - ingress.yml

@@ -39,6 +39,10 @@ spec:
           storage:
             local:
               enabled: true
+          notifier:
+            filesystem:
+              enabled: true
+              filename: /tmp/uwu.txt
   syncPolicy:
     automated:
       prune: true

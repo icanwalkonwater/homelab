@@ -11,6 +11,7 @@ resources:
 - cert-manager.yml
 - cert-manager-issuers.yml
 - monitoring.yml
+- sealed-secrets.yml
 - auth.yml
 - authelia.yml
 - mealie.yml

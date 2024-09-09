@@ -24,6 +24,8 @@ spec:
             value: Europe/Paris
           - name: LLDAP_LDAP_BASE_CN
             value: dc=homelab,dc=icanwalkonwater,dc=dev
+          - name: LLDAP_LDAP_USER_PASS
+            value: changeme
         ports:
           - name: ldap
             containerPort: 3890

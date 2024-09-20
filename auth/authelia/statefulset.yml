@@ -36,7 +36,7 @@ spec:
             - name: AUTHELIA_AUTHENTICATION_BACKEND_LDAP_TIMEOUT
               value: 5s
             - name: AUTHELIA_AUTHENTICATION_BACKEND_LDAP_START_TLS
-              value: false
+              value: 'false'
             - name: AUTHELIA_AUTHENTICATION_BACKEND_LDAP_BASE_DN
               value: dc=homelab,dc=icanwalkonwater,dc=dev
             - name: AUTHELIA_AUTHENTICATION_BACKEND_LDAP_ADDITIONAL_USERS_DN

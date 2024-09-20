@@ -18,6 +18,7 @@ spec:
       containers:
         - name: authelia
           image: ghcr.io/authelia/authelia:4.38.10
+          enableServiceLinks: false
           env:
             - name: PUID
               value: '1000'

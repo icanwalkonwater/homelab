@@ -79,8 +79,10 @@ spec:
             - name: config
               mountPath: /config/configuration.yml
               subPath: configuration.yml
+              readOnly: true
             - name: credentials
               mountPath: /config/creds
+              readOnly: true
             - name: storage
               mountPath: /data
       volumes:

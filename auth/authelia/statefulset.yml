@@ -52,6 +52,10 @@ spec:
               readOnly: true
             - name: storage
               mountPath: /data
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 128Mi
       volumes:
         - name: config
           configMap:

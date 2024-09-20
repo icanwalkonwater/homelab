@@ -4,5 +4,6 @@ kind: Kustomization
 
 namespace: auth
 resources:
-  - deployment.yml
+  - statefulset.yml
   - service.yml
+  - lldap-credentials.yml

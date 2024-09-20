@@ -1,0 +1,68 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: lldap
+  labels:
+    app.kubernetes.io/name: lldap
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: lldap
+  replicas: 1
+
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: lldap
+    spec:
+      containers:
+      - name: lldap
+        image: ghcr.io/lldap/lldap:2024-09-08-alpine-rootless
+        env:
+          - name: LLDAP_LDAP_BASE_CN
+            value: dc=homelab,dc=icanwalkonwater,dc=dev
+          - name: LLDAP_LDAP_USER_PASS
+            valueFrom:
+              secretKeyRef:
+                name: lldap-credentials
+                key: admin-password.txt
+          - name: LLDAP_JWT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: lldap-credentials
+                key: jwt-secret.txt
+          - name: LLDA_KEY_SEED
+            valueFrom:
+              secretKeyRef:
+                name: lldap-credentials
+                key: key-seed.txt
+          - name: TZ
+            value: Europe/Paris
+        ports:
+          - name: ldap
+            containerPort: 3890
+          - name: ldaps
+            containerPort: 6360
+          - name: http
+            containerPort: 17170
+        volumeMounts:
+          - name: storage
+            mountPath: /data
+        resources:
+          limits:
+            cpu: 100m
+            memory: 128Mi
+
+  persistentVolumeClaimRetentionPolicy:
+    whenDeleted: Retain
+    whenScaled: Retain
+  volumeClaimTemplates:
+    - metadata:
+        name: storage
+      spec:
+        accessMode: [ReadWriteOncePod]
+        storage-class-name: local-path-fast
+        resources:
+          requests:
+            storage: 1Gi

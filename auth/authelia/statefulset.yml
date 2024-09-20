@@ -15,10 +15,10 @@ spec:
       labels:
         app.kubernetes.io/name: authelia
     spec:
+      enableServiceLinks: false
       containers:
         - name: authelia
           image: ghcr.io/authelia/authelia:4.38.10
-          enableServiceLinks: false
           env:
             - name: PUID
               value: '1000'

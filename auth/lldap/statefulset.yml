@@ -62,7 +62,7 @@ spec:
         name: storage
       spec:
         accessModes: [ReadWriteOncePod]
-        storage-class-name: local-path-fast
+        storageClassName: local-path-fast
         resources:
           requests:
             storage: 1Gi

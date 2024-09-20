@@ -76,11 +76,17 @@ spec:
             - name: http
               containerPort: 9091
           volumeMounts:
-            - name: storage
-              mountPath: /data
+            - name: config
+              mountPath: /config/configuration.yml
+              subPath: configuration.yml
             - name: credentials
               mountPath: /config/creds
+            - name: storage
+              mountPath: /data
       volumes:
+        - name: config
+          configMap:
+            name: authelia-config
         - name: credentials
           secret:
             secretName: authelia-credentials

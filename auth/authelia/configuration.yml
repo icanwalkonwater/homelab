@@ -34,4 +34,7 @@ storage:
 
 notifier:
   filesystem:
-    filename: '/config/notification.txt'
+    filename: /config/notification.txt
+
+access_control:
+  default_policy: one_factor

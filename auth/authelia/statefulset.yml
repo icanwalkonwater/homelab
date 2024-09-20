@@ -23,40 +23,6 @@ spec:
               value: '1000'
             - name: PGID
               value: '1000'
-            - name: AUTHELIA_THEME
-              value: dark
-            - name: AUTHELIA_STORAGE_LOCAL_PATH
-              value: /data/db.sqlite3
-
-            # LDAP stuff
-            - name: AUTHELIA_AUTHENTICATION_BACKEND_LDAP_IMPLEMENTATION
-              value: custom
-            - name: AUTHELIA_AUTHENTICATION_BACKEND_LDAP_ADDRESS
-              value: ldap://lldap:3890
-            - name: AUTHELIA_AUTHENTICATION_BACKEND_LDAP_TIMEOUT
-              value: 5s
-            - name: AUTHELIA_AUTHENTICATION_BACKEND_LDAP_START_TLS
-              value: 'false'
-            - name: AUTHELIA_AUTHENTICATION_BACKEND_LDAP_BASE_DN
-              value: dc=homelab,dc=icanwalkonwater,dc=dev
-            - name: AUTHELIA_AUTHENTICATION_BACKEND_LDAP_ADDITIONAL_USERS_DN
-              value: ou=people
-            - name: AUTHELIA_AUTHENTICATION_BACKEND_LDAP_USERS_FILTER
-              value: (&({username_attribute}={input})(objectClass=person))
-            - name: AUTHELIA_AUTHENTICATION_BACKEND_LDAP_ADDITIONAL_GROUPS_DN
-              value: ou=groups
-            - name: AUTHELIA_AUTHENTICATION_BACKEND_LDAP_GROUPS_FILTER
-              value: (member={dn})
-            - name: AUTHELIA_AUTHENTICATION_BACKEND_LDAP_ATTRIBUTES_DISPLAY_NAME
-              value: displayName
-            - name: AUTHELIA_AUTHENTICATION_BACKEND_LDAP_ATTRIBUTES_USERNAME
-              value: uid
-            - name: AUTHELIA_AUTHENTICATION_BACKEND_LDAP_ATTRIBUTES_GROUP_NAME
-              value: cn
-            - name: AUTHELIA_AUTHENTICATION_BACKEND_LDAP_ATTRIBUTES_MAIL
-              value: mail
-            - name: AUTHELIA_AUTHENTICATION_BACKEND_LDAP_USER
-              value: uid=authelia,ou=people,dc=homelab,dc=icanwalkonwater,dc=dev
             
             # Secrets
             - name: AUTHELIA_SESSION_SECRET_FILE

@@ -4,9 +4,9 @@ kind: Service
 metadata:
   name: authelia
 spec:
+  type: ClusterIP
   selector:
     app.kubernetes.io/name: authelia
-  type: ClusterIP
   ports:
     - name: http
       port: 9091

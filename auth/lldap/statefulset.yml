@@ -61,7 +61,7 @@ spec:
     - metadata:
         name: storage
       spec:
-        accessMode: [ReadWriteOncePod]
+        accessModes: [ReadWriteOncePod]
         storage-class-name: local-path-fast
         resources:
           requests:

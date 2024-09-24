@@ -37,7 +37,7 @@ spec:
             - name: OIDC_CLIENT_ID
               value: mealie
             - name: OIDC_AUTO_REDIRECT
-              value: 'false'
+              value: 'true'
             - name: OIDC_ADMIN_GROUP
               value: mealie.admin
             - name: OIDC_USER_GROUP

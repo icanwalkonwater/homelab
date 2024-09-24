@@ -41,11 +41,17 @@ access_control:
 
 identity_providers:
   oidc:
+    jwks:
+      - algorithm: RS256
+        key: {{ secret "/config/certs/tls.key" | mindent 10 "|" | msquote }}
+        certificate_chain: {{ secret "/config/certs/tls.crt" | mindent 10 "|" | msquote }}
+
     clients:
       - client_id: mealie
         client_name: Mealie
         public: true
-        required_pkce: true
+        authorization_policy: one_factor
+        require_pkce: true
         pkce_challenge_method: S256
         redirect_uris:
           - https://mealie.homelab.icanwalkonwater.dev/login

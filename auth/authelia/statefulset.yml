@@ -34,8 +34,8 @@ spec:
               value: /config/creds/storage-encryption-key.txt
             - name: AUTHELIA_AUTHENTICATION_BACKEND_LDAP_PASSWORD_FILE
               value: /config/creds/ldap-password.txt
-            # - name: AUTHELIA_IDENTITY_PROVIDERS_OIDC_HMAC_SECRET_FILE
-            #   value: /config/creds/oidc-hmac-secret.txt
+            - name: AUTHELIA_IDENTITY_PROVIDERS_OIDC_HMAC_SECRET_FILE
+              value: /config/creds/oidc-hmac-secret.txt
 
             - name: TZ
               value: Europe/Paris
@@ -50,6 +50,9 @@ spec:
             - name: credentials
               mountPath: /config/creds
               readOnly: true
+            - name: certificate
+              mountPath: /config/certs
+              readOnly: true
             - name: storage
               mountPath: /data
           resources:
@@ -63,6 +66,9 @@ spec:
         - name: credentials
           secret:
             secretName: authelia-credentials
+        - name: certificate
+          secret:
+            secretName: authelia-tls
 
   persistentVolumeClaimRetentionPolicy:
     whenDeleted: Retain

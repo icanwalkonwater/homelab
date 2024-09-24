@@ -22,6 +22,9 @@ authentication_backend:
 
     user: uid=authelia,ou=people,dc=homelab,dc=icanwalkonwater,dc=dev
 
+  password_reset:
+    disable: false
+
 session:
   cookies:
     - name: authelia_session

@@ -26,7 +26,7 @@ session:
   cookies:
     - name: authelia_session
       domain: homelab.icanwalkonwater.dev
-      authelia_url: https://authelia.homelab.icanwalkonwater.dev
+      authelia_url: https://auth.homelab.icanwalkonwater.dev
 
 storage:
   local:

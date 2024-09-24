@@ -8,7 +8,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: authelia.homelab.icanwalkonwater.dev
+    - host: auth.homelab.icanwalkonwater.dev
       http:
         paths:
           - path: /
@@ -21,4 +21,5 @@ spec:
   tls:
     - hosts:
         - authelia.homelab.icanwalkonwater.dev
+        - auth.homelab.icanwalkonwater.dev
       secretName: authelia-tls

@@ -10,6 +10,8 @@ spec:
     matchLabels:
       app.kubernetes.io/name: mealie
   replicas: 1
+  revisionHistoryLimit: 2
+  serviceName: mealie
 
   template:
     metadata:

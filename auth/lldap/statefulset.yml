@@ -10,6 +10,8 @@ spec:
     matchLabels:
       app.kubernetes.io/name: lldap
   replicas: 1
+  revisionHistoryLimit: 2
+  serviceName: lldap
 
   template:
     metadata:

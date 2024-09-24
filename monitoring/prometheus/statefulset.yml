@@ -10,6 +10,8 @@ spec:
     matchLabels:
       app.kubernetes.io/name: prometheus
   replicas: 1
+  revisionHistoryLimit: 2
+  serviceName: prometheus
 
   template:
     metadata:

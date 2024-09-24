@@ -19,6 +19,8 @@ spec:
       containers:
         - name: authelia
           image: ghcr.io/authelia/authelia:4.38.10
+          args:
+            - --config.experimental.filters=template
           env:
             - name: PUID
               value: '1000'

@@ -43,8 +43,8 @@ identity_providers:
   oidc:
     jwks:
       - algorithm: RS256
-        key: '{{ secret "/config/certs/tls.key" | mindent 10 "|" | msquote }}'
-        # certificate_chain: '{{ secret "/config/certs/tls.crt" | mindent 10 "|" | msquote }}'
+        key: {{ secret "/config/certs/tls.key" | mindent 10 "|" | msquote }}
+        certificate_chain: {{ secret "/config/certs/tls.crt" | mindent 10 "|" | msquote }}
 
     clients:
       - client_id: mealie

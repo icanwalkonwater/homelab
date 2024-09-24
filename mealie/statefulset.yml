@@ -26,6 +26,22 @@ spec:
               value: sqlite
             - name: BASE_URL
               value: mealie.homelab.icanwalkonwater.dev
+
+            # OIDC auth
+            - name: OIDC_AUTH_ENABLED
+              value: 'true'
+            - name: OIDC_SIGNUP_ENABLED
+              value: 'true'
+            - name: OIDC_CONFIGURATION_URL
+              value: https://auth.homelab.icanwalkonwater.dev/.well-known/openid-configuration
+            - name: OIDC_CLIENT_ID
+              value: mealie
+            - name: OIDC_AUTO_REDIRECT
+              value: 'false'
+            - name: OIDC_ADMIN_GROUP
+              value: mealie.admin
+            - name: OIDC_USER_GROUP
+              value: mealie.user
           ports:
             - containerPort: 9000
               name: http

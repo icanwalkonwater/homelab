@@ -20,6 +20,7 @@ spec:
         - name: authelia
           image: ghcr.io/authelia/authelia:4.38.10
           args:
+            - authelia
             - --config.experimental.filters=template
           env:
             - name: PUID

@@ -46,6 +46,9 @@ identity_providers:
         key: {{ secret "/config/certs/tls.key" | mindent 10 "|" | msquote }}
         certificate_chain: {{ secret "/config/certs/tls.crt" | mindent 10 "|" | msquote }}
 
+    cors:
+      allowed_origins_from_client_redirect_uris: true
+
     clients:
       - client_id: mealie
         client_name: Mealie

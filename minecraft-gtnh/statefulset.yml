@@ -72,7 +72,6 @@ spec:
               mountPath: /data
           resources:
             limits:
-              cpu: 6000m
               memory: 10Gi
 
   persistentVolumeClaimRetentionPolicy:

@@ -19,7 +19,7 @@ spec:
         app.kubernetes.io/name: minecraft
     spec:
       containers:
-        - name: mealie
+        - name: minecraft
           image: docker.io/itzg/minecraft-server:2024.9.0-java21
           env:
             - name: TZ

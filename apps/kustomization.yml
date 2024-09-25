@@ -8,7 +8,6 @@ resources:
 - argocd.yml
 - local-path-provisioner.yml
 - ingress-nginx.yml
-- ingress-nginx-config.yml
 - cert-manager.yml
 - cert-manager-issuers.yml
 - monitoring.yml

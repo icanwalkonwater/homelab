@@ -17,8 +17,6 @@ spec:
       parameters:
       - name: controller.extraArgs.enable-ssl-passthrough
         value: 'true'
-      - name: controller.extraArgs.tcp-services-configmap
-        value: ingress-nginx/tcp-services-cm
   syncPolicy:
     automated:
       prune: true

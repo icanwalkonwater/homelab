@@ -1,7 +1,0 @@
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: tcp-services-cm
-data:
-  '25565': minecraft-gtnh/minecraft:minecraft

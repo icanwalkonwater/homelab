@@ -7,4 +7,4 @@ generatorOptions:
 
 namespace: ingress-nginx
 resources:
-  - tcp-service-cm.yml
+  - tcp-services-cm.yml

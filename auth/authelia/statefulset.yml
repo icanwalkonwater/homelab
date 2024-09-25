@@ -24,10 +24,8 @@ spec:
             - authelia
             - --config.experimental.filters=template
           env:
-            - name: PUID
-              value: '1000'
-            - name: PGID
-              value: '1000'
+            - { name: PUID, value: '1000' }
+            - { name: PGID, value: '1000' }
             
             # Secrets
             - name: AUTHELIA_SESSION_SECRET_FILE
@@ -41,11 +39,9 @@ spec:
             - name: AUTHELIA_IDENTITY_PROVIDERS_OIDC_HMAC_SECRET_FILE
               value: /config/creds/oidc-hmac-secret.txt
 
-            - name: TZ
-              value: Europe/Paris
+            - { name: TZ, value: Europe/Paris }
           ports:
-            - name: http
-              containerPort: 9091
+            - { name: http, containerPort: 9091 }
           volumeMounts:
             - name: config
               mountPath: /config/configuration.yml
@@ -84,5 +80,4 @@ spec:
         accessModes: [ReadWriteOncePod]
         storageClassName: local-path-fast
         resources:
-          requests:
-            storage: 1Gi
+          requests: { storage: 1Gi }

@@ -15,10 +15,7 @@ spec:
           - path: /
             pathType: Prefix
             backend:
-              service:
-                name: authelia
-                port:
-                  name: http
+              service: { name: authelia, port: { name: http } }
   tls:
     - hosts:
         - authelia.homelab.icanwalkonwater.dev

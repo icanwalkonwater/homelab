@@ -25,8 +25,7 @@ spec:
             - --config.file=/etc/prometheus/prometheus.yml
             - --log.level=debug
           ports:
-            - containerPort: 9090
-              name: http
+            - { name: http, containerPort: 9090 }
           volumeMounts:
             - name: config
               mountPath: /etc/prometheus/prometheus.yml
@@ -35,16 +34,13 @@ spec:
             - name: storage
               mountPath: /prometheus
           resources:
-            limits:
-              cpu: 250m
-              memory: 500Mi
+            limits: { cpu: 250m, memory: 500Mi }
       volumes:
         - name: config
           configMap:
             name: prometheus-cm
             items:
-              - key: prometheus.yml
-                path: prometheus.yml
+              - { key: prometheus.yml, path: prometheus.yml }
       serviceAccountName: prometheus
 
   persistentVolumeClaimRetentionPolicy:
@@ -57,5 +53,4 @@ spec:
         accessModes: [ReadWriteOncePod]
         storageClassName: local-path-slow
         resources:
-          requests:
-            storage: 100Gi
+          requests: { storage: 100Gi }

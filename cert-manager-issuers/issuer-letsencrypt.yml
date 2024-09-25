@@ -25,6 +25,4 @@ spec:
     privateKeySecretRef:
       name: letsencrypt-account-key
     solvers:
-      - http01:
-          ingress:
-            ingressClassName: nginx
+      - http01: { ingress: { ingressClassName: nginx } }

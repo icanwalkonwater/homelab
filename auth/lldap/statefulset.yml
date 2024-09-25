@@ -23,8 +23,7 @@ spec:
         - name: lldap
           image: ghcr.io/lldap/lldap:2024-09-08-alpine-rootless
           env:
-            - name: LLDAP_LDAP_BASE_DN
-              value: dc=homelab,dc=icanwalkonwater,dc=dev
+            - { name: LLDAP_LDAP_BASE_DN, value: dc=homelab,dc=icanwalkonwater,dc=dev }
             - name: LLDAP_LDAP_USER_PASS
               valueFrom:
                 secretKeyRef:
@@ -40,15 +39,11 @@ spec:
                 secretKeyRef:
                   name: lldap-credentials
                   key: key-seed.txt
-            - name: TZ
-              value: Europe/Paris
+            - { name: TZ, value: Europe/Paris }
           ports:
-            - name: ldap
-              containerPort: 3890
-            - name: ldaps
-              containerPort: 6360
-            - name: http
-              containerPort: 17170
+            - { name: ldap, containerPort: 3890 }
+            - { name: ldaps, containerPort: 6360 }
+            - { name: http, containerPort: 17170 }
           volumeMounts:
             - name: storage
               mountPath: /data

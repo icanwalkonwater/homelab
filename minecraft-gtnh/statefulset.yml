@@ -22,57 +22,35 @@ spec:
         - name: minecraft
           image: docker.io/itzg/minecraft-server:2024.9.0-java21
           env:
-            - name: TZ
-              value: Europe/Paris
-            - name: MEMORY
-              value: 10G
-            - name: EULA
-              value: 'true'
-            - name: VERSION
-              value: 1.7.10
-            - name: OVERRIDE_SERVER_PROPERTIES
-              value: 'true'
-            - name: MOTD
-              value: QG des xX_g@ym€rs_Xx
-            - name: DIFFICULTY
-              value: '2'
-            - name: VIEW_DISTANCE
-              value: '16'
+            - { name: TZ, value: Europe/Paris }
+            - { name: MEMORY, value: 10G }
+            - { name: EULA, value: 'true' }
+            - { name: VERSION, value: 1.7.10 }
+            - { name: OVERRIDE_SERVER_PROPERTIES, value: 'true' }
+            - { name: MOTD, value: QG des xX_g@ym€rs_Xx }
+            - { name: DIFFICULTY, value: '2' }
+            - { name: VIEW_DISTANCE, value: '16' }
 
-            - name: OVERRIDE_WHITELIST
-              value: 'true'
-            - name: WHITELIST
-              value: |
-                icanwalkonwater
+            - { name: OVERRIDE_WHITELIST, value: 'true' }
+            - { name: WHITELIST, value: icanwalkonwater }
 
-            - name: OVERRIDE_OPS
-              value: 'true'
-            - name: OPS
-              value: |
-                icanwalkonwater
+            - { name: OVERRIDE_OPS, value: 'true' }
+            - { name: OPS, value: icanwalkonwater }
 
-            - name: ENABLE_AUTOPAUSE
-              value: 'true'
-            - name: MAX_TICK_TIME
-              value: '-1'
+            - { name: ENABLE_AUTOPAUSE, value: 'true' }
+            - { name: MAX_TICK_TIME, value: '-1' }
 
-            - name: SETUP_ONLY
-              value: 'false'
-            - name: TYPE
-              value: CUSTOM
-            - name: CUSTOM_SERVER
-              value: /data/lwjgl3ify-forgePatches.jar
-            - name: JVM_OPTS
-              value: '@/data/java9args.txt'
+            - { name: SETUP_ONLY, value: 'false' }
+            - { name: TYPE, value: CUSTOM }
+            - { name: CUSTOM_SERVER, value: /data/lwjgl3ify-forgePatches.jar }
+            - { name: JVM_OPTS, value: '@/data/java9args.txt' }
           ports:
-            - containerPort: 25565
-              name: minecraft
+            - { name: minecraft, containerPort: 25565 }
           volumeMounts:
             - name: storage
               mountPath: /data
           resources:
-            limits:
-              memory: 10Gi
+            limits: { memory: 10Gi }
 
   persistentVolumeClaimRetentionPolicy:
     whenDeleted: Retain
@@ -84,5 +62,4 @@ spec:
         accessModes: [ReadWriteOncePod]
         storageClassName: minecraft-data
         resources:
-          requests:
-            storage: 50Gi
+          requests: { storage: 50Gi }

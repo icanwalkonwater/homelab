@@ -14,10 +14,7 @@ spec:
       - path: /
         pathType: Prefix
         backend:
-          service:
-            name: grafana
-            port:
-              number: 3000
+          service: { name: grafana, port: { number: 3000 } }
   tls:
   - hosts:
     - grafana.homelab.icanwalkonwater.dev

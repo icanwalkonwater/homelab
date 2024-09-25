@@ -22,38 +22,25 @@ spec:
         - name: mealie
           image: ghcr.io/mealie-recipes/mealie:v1.12.0
           env:
-            - name: TZ
-              value: Europe/Paris
-            - name: DB_ENGINE
-              value: sqlite
-            - name: BASE_URL
-              value: mealie.homelab.icanwalkonwater.dev
+            - { name: TZ, value: Europe/Paris }
+            - { name: DB_ENGINE, value: sqlite }
+            - { name: BASE_URL, value: mealie.homelab.icanwalkonwater.dev }
 
             # OIDC auth
-            - name: OIDC_AUTH_ENABLED
-              value: 'true'
-            - name: OIDC_SIGNUP_ENABLED
-              value: 'true'
-            - name: OIDC_CONFIGURATION_URL
-              value: https://auth.homelab.icanwalkonwater.dev/.well-known/openid-configuration
-            - name: OIDC_CLIENT_ID
-              value: mealie
-            - name: OIDC_AUTO_REDIRECT
-              value: 'true'
-            - name: OIDC_ADMIN_GROUP
-              value: mealie.admin
-            - name: OIDC_USER_GROUP
-              value: mealie.user
+            - { name: OIDC_AUTH_ENABLED, value: 'true' }
+            - { name: OIDC_SIGNUP_ENABLED, value: 'true' }
+            - { name: OIDC_CONFIGURATION_URL, value: https://auth.homelab.icanwalkonwater.dev/.well-known/openid-configuration }
+            - { name: OIDC_CLIENT_ID, value: mealie }
+            - { name: OIDC_AUTO_REDIRECT, value: 'true' }
+            - { name: OIDC_ADMIN_GROUP, value: mealie.admin }
+            - { name: OIDC_USER_GROUP, value: mealie.user }
           ports:
-            - containerPort: 9000
-              name: http
+            - { name: http, containerPort: 9000 }
           volumeMounts:
             - name: storage
               mountPath: /app/data
           resources:
-            limits:
-              cpu: 1000m
-              memory: 512Mi
+            limits: { cpu: 1000m, memory: 512Mi }
 
   persistentVolumeClaimRetentionPolicy:
     whenDeleted: Retain
@@ -65,5 +52,4 @@ spec:
         accessModes: [ReadWriteOncePod]
         storageClassName: local-path-fast
         resources:
-          requests:
-            storage: 1Gi
+          requests: { storage: 1Gi }

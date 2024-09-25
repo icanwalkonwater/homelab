@@ -27,5 +27,4 @@ spec:
         - matchExpressions:
             - key: kubernetes.io/hostname
               operator: In
-              values:
-                - coruscant
+              values: [coruscant]

@@ -44,9 +44,7 @@ spec:
             - containerPort: 9100
               name: http
           resources:
-            requests:
-              cpu: 100m
-              memory: 100Mi
+            requests: { cpu: 100m, memory: 100Mi }
           volumeMounts:
             - name: rootfs
               mountPath: /host/rootfs
@@ -62,11 +60,8 @@ spec:
               readOnly: true
       volumes:
         - name: rootfs
-          hostPath:
-            path: /
+          hostPath: { path: / }
         - name: sysfs
-          hostPath:
-            path: /sys
+          hostPath: { path: /sys }
         - name: procfs
-          hostPath:
-            path: /proc
+          hostPath: { path: /proc }

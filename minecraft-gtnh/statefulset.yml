@@ -1,0 +1,89 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: minecraft
+  labels:
+    app.kubernetes.io/name: minecraft
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: minecraft
+  replicas: 1
+  revisionHistoryLimit: 2
+  serviceName: minecraft
+
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: minecraft
+    spec:
+      containers:
+        - name: mealie
+          image: docker.io/itzg/minecraft-server:2024.9.0-java21
+          env:
+            - name: TZ
+              value: Europe/Paris
+            - name: MEMORY
+              value: 10G
+            - name: EULA
+              value: 'true'
+            - name: VERSION
+              value: 1.7.10
+            - name: OVERRIDE_SERVER_PROPERTIES
+              value: 'true'
+            - name: MOTD
+              value: QG des xX_g@ym€rs_Xx
+            - name: DIFFICULTY
+              value: '2'
+            - name: VIEW_DISTANCE
+              value: '16'
+
+            - name: OVERRIDE_WHITELIST
+              value: 'true'
+            - name: WHITELIST
+              value: |
+                icanwalkonwater
+
+            - name: OVERRIDE_OPS
+              value: 'true'
+            - name: OPS
+              value: |
+                icanwalkonwater
+
+            - name: ENABLE_AUTOPAUSE
+              value: 'true'
+            - name: MAX_TICK_TIME
+              value: '-1'
+
+            - name: SETUP_ONLY
+              value: 'false'
+            - name: TYPE
+              value: CUSTOM
+            - name: CUSTOM_SERVER
+              value: /data/lwjgl3ify-forgePatches.jar
+            - name: JVM_OPTS
+              value: '@/data/java9args.txt'
+          ports:
+            - containerPort: 25565
+              name: minecraft
+          volumeMounts:
+            - name: storage
+              mountPath: /data
+          resources:
+            limits:
+              cpu: 6000m
+              memory: 10Gi
+
+  persistentVolumeClaimRetentionPolicy:
+    whenDeleted: Retain
+    whenScaled: Retain
+  volumeClaimTemplates:
+    - metadata:
+        name: storage
+      spec:
+        accessModes: [ReadWriteOncePod]
+        storageClassName: minecraft-data
+        resources:
+          requests:
+            storage: 50Gi

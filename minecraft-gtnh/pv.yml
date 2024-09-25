@@ -19,7 +19,7 @@ spec:
   storageClassName: minecraft-data
   persistentVolumeReclaimPolicy: Retain
   local:
-    path: /mnt/rootfs/@minecraft
+    path: '/mnt/rootfs/@minecraft'
   nodeAffinity:
     required:
       nodeSelectorTerms:
@@ -28,16 +28,3 @@ spec:
               operator: In
               values:
                 - coruscant
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: minecraft-data
-  labels:
-    app.kubernetes.io/name: minecraft-data
-spec:
-  accessModes: [ReadWriteOncePod]
-  storageClassName: minecraft-data
-  resources:
-    requests:
-      storage: 50Gi

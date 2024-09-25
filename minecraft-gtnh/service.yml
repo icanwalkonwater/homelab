@@ -6,7 +6,7 @@ metadata:
 spec:
   type: ClusterIP
   selector:
-    app: minecraft
+    app.kubernetes.io/name: minecraft
   ports:
   - name: minecraft
     protocol: TCP

@@ -4,7 +4,7 @@ kind: Service
 metadata:
   name: minecraft
 spec:
-  type: ClusterIP
+  type: NodePort
   selector:
     app.kubernetes.io/name: minecraft
   ports:
@@ -12,3 +12,4 @@ spec:
     protocol: TCP
     port: 25565
     targetPort: minecraft
+    nodePort: 25565

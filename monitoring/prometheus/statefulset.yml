@@ -34,7 +34,8 @@ spec:
             - name: storage
               mountPath: /prometheus
           resources:
-            limits: { cpu: 250m, memory: 500Mi }
+            requests: { cpu: 100m, memory: 250Mi }
+            limits: { cpu: 1000m, memory: 500Mi }
       volumes:
         - name: config
           configMap:

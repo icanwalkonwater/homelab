@@ -38,6 +38,7 @@ spec:
             - { name: OPS, value: icanwalkonwater }
 
             - { name: ENABLE_AUTOPAUSE, value: 'true' }
+            - { name: AUTOPAUSE_TIMEOUT_EST, value: '300' }
             - { name: MAX_TICK_TIME, value: '-1' }
 
             - { name: SETUP_ONLY, value: 'false' }

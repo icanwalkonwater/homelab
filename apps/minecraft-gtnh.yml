@@ -14,9 +14,16 @@ spec:
     repoURL: https://github.com/icanwalkonwater/homelab
     targetRevision: HEAD
     path: minecraft-gtnh
+
+  ignoreDifferences:
+    - group: "apps"
+      kind: "StatefulSet"
+      jsonPointers:
+        - /spec/replicas
   syncPolicy:
     automated:
       prune: true
-      selfHeal: false
+      selfHeal: true
     syncOptions:
     - CreateNamespace=true
+    - RespectIgnoreDifferences=true

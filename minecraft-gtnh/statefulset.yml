@@ -23,7 +23,8 @@ spec:
           image: docker.io/itzg/minecraft-server:2024.9.0-java21
           env:
             - { name: TZ, value: Europe/Paris }
-            - { name: MEMORY, value: 10G }
+            - { name: INIT_MEMORY, value: 4G }
+            - { name: MAX_MEMORY, value: 10G }
             - { name: EULA, value: 'true' }
             - { name: VERSION, value: 1.7.10 }
             - { name: OVERRIDE_SERVER_PROPERTIES, value: 'true' }
@@ -51,7 +52,8 @@ spec:
             - name: storage
               mountPath: /data
           resources:
-            limits: { memory: 10Gi }
+            requests: { memory: 4Gi }
+            limits: { memory: 10.1Gi }
 
   persistentVolumeClaimRetentionPolicy:
     whenDeleted: Retain

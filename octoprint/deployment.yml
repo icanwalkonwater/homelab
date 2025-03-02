@@ -28,7 +28,7 @@ spec:
           image: docker.io/octoprint/octoprint:1.10.3
           env: []
           ports:
-            - { name: http, containerPort: 80 }
+            - { name: http, containerPort: 5000 }
           volumeMounts:
             - name: dev-printer
               mountPath: /dev/ttyUSB0

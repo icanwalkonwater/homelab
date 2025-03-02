@@ -11,6 +11,6 @@ spec:
     app.kubernetes.io/name: octoprint
   ports:
     - name: http
-      port: 80
+      port: 5000
       protocol: TCP
       targetPort: http

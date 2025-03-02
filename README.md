@@ -1,6 +1,6 @@
 # homelab k3s infra
 
-## Bootstraping
+## Bootstrapping
 
 First install ArgoCD on the cluster: `kubectl apply -k argocd`.
 

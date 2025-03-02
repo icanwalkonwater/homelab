@@ -1,0 +1,96 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: octoprint
+  labels:
+    app.kubernetes.io/name: octoprint
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: octoprint
+  replicas: 1
+  revisionHistoryLimit: 2
+  serviceName: octoprint
+
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: octoprint
+    spec:
+      tolerations:
+        - key: rpi
+          operator: Equal
+          value: '1'
+          effect: NoSchedule
+      containers:
+        - name: octoprint
+          image: docker.io/octoprint/octoprint:1.10.3
+          env: {}
+          ports:
+            - { name: http, containerPort: 80 }
+          volumeMounts:
+            - name: dev-printer
+              mountPath: /dev/ttyUSB0
+          resources:
+            limits: { cpu: 2000m, memory: 256Mi }
+
+      volumes:
+        - name: dev-printer
+          hostPath:
+            path: /dev/ttyUSB0
+# ---
+# apiVersion: apps/v1
+# kind: StatefulSet
+# metadata:
+#   name: mealie
+#   labels:
+#     app.kubernetes.io/name: mealie
+# spec:
+#   selector:
+#     matchLabels:
+#       app.kubernetes.io/name: mealie
+#   replicas: 1
+#   revisionHistoryLimit: 2
+#   serviceName: mealie
+#
+#   template:
+#     metadata:
+#       labels:
+#         app.kubernetes.io/name: mealie
+#     spec:
+#       containers:
+#         - name: mealie
+#           image: ghcr.io/mealie-recipes/mealie:v1.12.0
+#           env:
+#             - { name: TZ, value: Europe/Paris }
+#             - { name: DB_ENGINE, value: sqlite }
+#             - { name: BASE_URL, value: mealie.homelab.icanwalkonwater.dev }
+#
+#             # OIDC auth
+#             - { name: OIDC_AUTH_ENABLED, value: 'true' }
+#             - { name: OIDC_SIGNUP_ENABLED, value: 'true' }
+#             - { name: OIDC_CONFIGURATION_URL, value: https://auth.homelab.icanwalkonwater.dev/.well-known/openid-configuration }
+#             - { name: OIDC_CLIENT_ID, value: mealie }
+#             - { name: OIDC_AUTO_REDIRECT, value: 'true' }
+#             - { name: OIDC_ADMIN_GROUP, value: mealie.admin }
+#             - { name: OIDC_USER_GROUP, value: mealie.user }
+#           ports:
+#             - { name: http, containerPort: 9000 }
+#           volumeMounts:
+#             - name: storage
+#               mountPath: /app/data
+#           resources:
+#             limits: { cpu: 1000m, memory: 512Mi }
+#
+#   persistentVolumeClaimRetentionPolicy:
+#     whenDeleted: Retain
+#     whenScaled: Retain
+#   volumeClaimTemplates:
+#     - metadata:
+#         name: storage
+#       spec:
+#         accessModes: [ReadWriteOncePod]
+#         storageClassName: local-path-fast
+#         resources:
+#           requests: { storage: 1Gi }

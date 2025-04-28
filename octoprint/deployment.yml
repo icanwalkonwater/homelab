@@ -1,6 +1,6 @@
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: octoprint
   labels:
@@ -35,17 +35,24 @@ spec:
           ports:
             - { name: http, containerPort: 5000 }
           volumeMounts:
-            - name: devfs-host
-              mountPath: /host/dev
+            - name: storage
+              mountPath: /octoprint
           resources:
             limits: { cpu: 2000m, memory: 256Mi }
           securityContext:
             privileged: true
 
-      volumes:
-        - name: devfs-host
-          hostPath:
-            path: /dev
+  persistentVolumeClaimRetentionPolicy:
+    whenDeleted: Retain
+    whenScaled: Retain
+  volumeClaimTemplates:
+    - metadata:
+        name: storage
+      spec:
+        accessModes: [ReadWriteOncePod]
+        storageClassName: local-path-slow
+        resources:
+          requests: { storage: 10Gi }
 # ---
 # apiVersion: apps/v1
 # kind: StatefulSet

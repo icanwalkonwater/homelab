@@ -19,8 +19,10 @@ spec:
       labels:
         app.kubernetes.io/name: octoprint
     spec:
+      nodeSelector:
+        lucasfilm/printer: 'true'
       tolerations:
-        - key: rpi
+        - key: lucasfilm/mortis
           operator: Equal
           value: '1'
           effect: NoSchedule
@@ -33,15 +35,15 @@ spec:
           ports:
             - { name: http, containerPort: 5000 }
           volumeMounts:
-            - name: dev-printer
-              mountPath: /dev/ttyUSB0
+            - name: devfs-host
+              mountPath: /host/dev
           resources:
             limits: { cpu: 2000m, memory: 256Mi }
 
       volumes:
-        - name: dev-printer
+        - name: devfs-host
           hostPath:
-            path: /dev/ttyUSB0
+            path: /dev
 # ---
 # apiVersion: apps/v1
 # kind: StatefulSet

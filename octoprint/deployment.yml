@@ -39,6 +39,8 @@ spec:
               mountPath: /host/dev
           resources:
             limits: { cpu: 2000m, memory: 256Mi }
+          securityContext:
+            privileged: true
 
       volumes:
         - name: devfs-host

@@ -32,7 +32,7 @@ spec:
           enableServiceLinks: false
           env:
             - { name: OCTOPRINT_PORT, value: '5000' }
-            - { name: ENABLE_MJPG_STREAMER, value: 'true' }
+            - { name: ENABLE_MJPG_STREAMER, value: 'false' }
           ports:
             - { name: http, containerPort: 80 }
           volumeMounts:

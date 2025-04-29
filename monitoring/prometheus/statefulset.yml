@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: prometheus
-          image: docker.io/prom/prometheus:v2.51.2
+          image: prometheus
           args:
             - --config.file=/etc/prometheus/prometheus.yml
             - --log.level=debug

@@ -6,3 +6,11 @@ namespace: auth
 resources:
   - lldap
   - authelia
+
+images:
+  - name: lldap
+    newName: ghcr.io/lldap/lldap
+    newTag: 2024-09-08-alpine-rootless
+  - name: authelia
+    newName: ghcr.io/authelia/authelia
+    newTag: 4.38.10

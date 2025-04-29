@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: grafana
-          image: docker.io/grafana/grafana-oss:10.4.2
+          image: grafana
           ports:
             - { name: http, containerPort: 3000 }
           volumeMounts:

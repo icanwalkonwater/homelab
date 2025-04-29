@@ -7,3 +7,8 @@ resources:
   - pv.yml
   - statefulset.yml
   - service.yml
+
+images:
+  - name: minecraft-itzg
+    newName: docker.io/itzg/minecraft-server
+    newTag: 2024.9.0-java21

@@ -16,3 +16,11 @@ resources:
   - grafana
   - prometheus
   - node-exporter.yml
+
+images:
+  - name: grafana
+    newName: docker.io/grafana/grafana-oss
+    newTag: 10.4.2
+  - name: prometheus
+    newName: docker.io/prom/prometheus
+    newTag: v2.51.2

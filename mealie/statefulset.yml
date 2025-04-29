@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: mealie
-          image: ghcr.io/mealie-recipes/mealie:v1.12.0
+          image: mealie
           env:
             - { name: TZ, value: Europe/Paris }
             - { name: DB_ENGINE, value: sqlite }

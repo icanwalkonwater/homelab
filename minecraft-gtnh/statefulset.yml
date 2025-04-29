@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: minecraft
-          image: docker.io/itzg/minecraft-server:2024.9.0-java21
+          image: minecraft-itzg
           env:
             - { name: TZ, value: Europe/Paris }
             - { name: INIT_MEMORY, value: 4G }

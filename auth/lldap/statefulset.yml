@@ -21,7 +21,7 @@ spec:
       enableServiceLinks: false
       containers:
         - name: lldap
-          image: ghcr.io/lldap/lldap:2024-09-08-alpine-rootless
+          image: lldap
           env:
             - { name: LLDAP_LDAP_BASE_DN, value: 'dc=homelab,dc=icanwalkonwater,dc=dev' }
             - name: LLDAP_LDAP_USER_PASS

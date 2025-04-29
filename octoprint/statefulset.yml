@@ -28,7 +28,7 @@ spec:
           effect: NoSchedule
       containers:
         - name: octoprint
-          image: docker.io/octoprint/octoprint:canary@sha256:1ef4c0ff7d85c221e9225fc72d4aafee526f2d7b934d60b553db348f9e4aa859
+          image: octoprint
           enableServiceLinks: false
           env:
             - { name: OCTOPRINT_PORT, value: '5000' }

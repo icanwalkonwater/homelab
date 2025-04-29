@@ -7,3 +7,8 @@ resources:
   - statefulset.yml
   - service.yml
   - ingress.yml
+
+images:
+  - name: mealie
+    newName: ghcr.io/mealie-recipes/mealie
+    newTag: v1.12.0

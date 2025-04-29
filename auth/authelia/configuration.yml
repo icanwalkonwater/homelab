@@ -56,10 +56,6 @@ identity_providers:
       - client_id: mealie
         client_name: Mealie
         client_secret: '$argon2id$v=19$m=65536,t=3,p=4$EirC80zBvWgLlx9h8iUNNQ$xAPC+xQQ6FuMLiWr5MS6DYPwuTTIUmNd28nx54TW8yw'
-      volumes:
-        - name: oidc-credentials
-          secret:
-            secretName: mealie-oidc-credentials
         public: false
         authorization_policy: one_factor
         require_pkce: true

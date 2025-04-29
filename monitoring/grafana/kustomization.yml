@@ -5,6 +5,7 @@ resources:
 - deployment.yml
 - service.yml
 - ingress.yml
+- oidc-credentials.yml
 
 configMapGenerator:
 - name: grafana-config-cm

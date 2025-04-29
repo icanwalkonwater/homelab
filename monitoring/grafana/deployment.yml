@@ -31,6 +31,7 @@ spec:
                   key: client-secret
             - { name: GF_AUTH_GENERIC_OAUTH_SCOPES, value: 'openid profile groups email' }
             - { name: GF_AUTH_GENERIC_OAUTH_EMPTY_SCOPES, value: 'false' }
+            - { name: GF_AUTH_GENERIC_OAUTH_AUTO_LOGIN, value: 'true' }
             - { name: GF_AUTH_GENERIC_OAUTH_AUTH_URL, value: https://auth.homelab.icanwalkonwater.dev/api/oidc/authorization }
             - { name: GF_AUTH_GENERIC_OAUTH_TOKEN_URL, value: https://auth.homelab.icanwalkonwater.dev/api/oidc/token }
             - { name: GF_AUTH_GENERIC_OAUTH_API_URL, value: https://auth.homelab.icanwalkonwater.dev/api/oidc/userinfo }

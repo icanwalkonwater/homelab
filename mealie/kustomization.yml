@@ -7,6 +7,7 @@ resources:
   - statefulset.yml
   - service.yml
   - ingress.yml
+  - oidc-credentials.yml
 
 images:
   - name: mealie

@@ -20,49 +20,52 @@ spec:
     spec:
       containers:
         - name: minecraft
-          image: minecraft-itzg
+          image: minecraft-gtnh
           env:
-            - { name: TZ, value: Europe/Paris }
             - { name: INIT_MEMORY, value: 4G }
             - { name: MAX_MEMORY, value: 10G }
             - { name: EULA, value: 'true' }
-            - { name: VERSION, value: 1.7.10 }
-            - { name: OVERRIDE_SERVER_PROPERTIES, value: 'true' }
-            - { name: MOTD, value: QG des xX_g@ym€rs_Xx }
+            - { name: SEED, value: '1293967824733727157' }
             - { name: DIFFICULTY, value: '2' }
-            - { name: VIEW_DISTANCE, value: '16' }
-
-            - { name: OVERRIDE_WHITELIST, value: 'true' }
-            - { name: WHITELIST, value: icanwalkonwater }
-
-            - { name: OVERRIDE_OPS, value: 'true' }
-            - { name: OPS, value: icanwalkonwater }
-
-            - { name: ENABLE_AUTOPAUSE, value: 'true' }
-            - { name: AUTOPAUSE_TIMEOUT_EST, value: '1200' }
-            - { name: MAX_TICK_TIME, value: '-1' }
-
-            - { name: SETUP_ONLY, value: 'false' }
-            - { name: TYPE, value: CUSTOM }
-            - { name: CUSTOM_SERVER, value: /data/lwjgl3ify-forgePatches.jar }
-            - { name: JVM_OPTS, value: '@/data/java9args.txt' }
+            - { name: VIEW_DISTANCE, value: '32' }
+            - { name: MOTD, value: 'GregTech: Nuwu Horizowos' }
           ports:
             - { name: minecraft, containerPort: 25565 }
           volumeMounts:
-            - name: storage
-              mountPath: /data
+            - { name: world, mountPath: /minecraft/World }
+            - { name: backups, mountPath: /minecraft/backups }
+            - name: provision-players
+              mountPath: /minecraft/whitelist.json
+              subPath: whitelist.json
+              readOnly: true
+            - name: provision-players
+              mountPath: /minecraft/ops.json
+              subPath: ops.json
+              readOnly: true
           resources:
             requests: { memory: 4Gi }
             limits: { memory: 10.1Gi }
+
+      volumes:
+        - name: provision-players
+          configMap:
+            name: minecraft-gtnh-cm
 
   persistentVolumeClaimRetentionPolicy:
     whenDeleted: Retain
     whenScaled: Retain
   volumeClaimTemplates:
     - metadata:
-        name: storage
+        name: world
       spec:
         accessModes: [ReadWriteOncePod]
-        storageClassName: minecraft-data
+        storageClassName: local-path-fast
         resources:
-          requests: { storage: 50Gi }
+          requests: { storage: 20Gi }
+    - metadata:
+        name: backups
+      spec:
+        accessModes: [ReadWriteOncePod]
+        storageClassName: local-path-slow
+        resources:
+          requests: { storage: 100Gi }

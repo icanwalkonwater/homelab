@@ -8,7 +8,13 @@ resources:
   - statefulset.yml
   - service.yml
 
+configMapGenerator:
+  - name: minecraft-gtnh-cm
+    files:
+      - whitelist.json=data/whitelist.json
+      - ops.json=data/ops.json
+
 images:
-  - name: minecraft-itzg
-    newName: docker.io/itzg/minecraft-server
-    newTag: 2024.9.0-java21
+  - name: minecraft-gtnh
+    newName: ghcr.io/icanwalkonwater/minecraft-gtnh
+    newTag: 2.7.4-java21

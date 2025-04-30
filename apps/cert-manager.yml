@@ -18,15 +18,15 @@ spec:
       - name: crds.enabled
         value: 'true'
       - name: resources
-        value: |-
+        value:
           requests: { cpu: 10m, memory: 64Mi }
           limits: { cpu: 1000m, memory: 128Mi }
       - name: cainjector.resources
-        value: |-
+        value:
           requests: { cpu: 10m, memory: 64Mi }
           limits: { cpu: 1000m, memory: 128Mi }
       - name: webhook.resources
-        value: |-
+        value:
           requests: { cpu: 10m, memory: 64Mi }
           limits: { cpu: 1000m, memory: 128Mi }
   syncPolicy:

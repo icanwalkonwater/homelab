@@ -5,9 +5,11 @@ set -eu -o pipefail
 GTNH_VERSION='2.7.4'
 GTNH_VARIANT='Java_17-21'
 
-REPO_PREFIX="ghcr.io/icanwalkonwater"
+IMAGE_REPO="ghcr.io/icanwalkonwater"
 IMAGE_NAME="minecraft-gtnh"
-IMAGE_TAG="$GTNH_VERSION-java21"
+IMAGE_TAG_REV="1"
+
+IMAGE_TAG="$GTNH_VERSION-java21-rev$IMAGE_TAG_REV"
 
 docker build \
   --build-arg GTNH_VERSION="$GTNH_VERSION" \
@@ -15,9 +17,9 @@ docker build \
   --label org.opencontainers.image.source=https://github.com/icanwalkonwater/homelab \
   -t "$IMAGE_NAME:$IMAGE_TAG" \
   -t "$IMAGE_NAME:latest" \
-  -t "$REPO_PREFIX/$IMAGE_NAME:$IMAGE_TAG" \
-  -t "$REPO_PREFIX/$IMAGE_NAME:latest" \
+  -t "$IMAGE_REPO/$IMAGE_NAME:$IMAGE_TAG" \
+  -t "$IMAGE_REPO/$IMAGE_NAME:latest" \
   ./image
 
-docker push "$REPO_PREFIX/$IMAGE_NAME:$IMAGE_TAG"
-docker push "$REPO_PREFIX/$IMAGE_NAME:latest"
+docker push "$IMAGE_REPO/$IMAGE_NAME:$IMAGE_TAG"
+docker push "$IMAGE_REPO/$IMAGE_NAME:latest"

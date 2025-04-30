@@ -17,4 +17,4 @@ configMapGenerator:
 images:
   - name: minecraft-gtnh
     newName: ghcr.io/icanwalkonwater/minecraft-gtnh
-    newTag: 2.7.4-java21
+    newTag: 2.7.4-java21-rev1

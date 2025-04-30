@@ -45,7 +45,7 @@ wake_on_start = true
 
 # Probe required server details when starting lazymc, wakes server on start.
 # Improves client compatibility. Automatically enabled if required by other config properties.
-#probe_on_start = false
+probe_on_start = true
 
 # Set to true if this server runs Forge.
 forge = true
@@ -55,7 +55,7 @@ start_timeout = 600
 stop_timeout = 150
 
 # To wake server, user must be in server whitelist if enabled on server.
-#wake_whitelist = true
+wake_whitelist = true
 
 # Block banned IPs as listed in banned-ips.json in server directory.
 #block_banned_ips = true
@@ -71,7 +71,7 @@ stop_timeout = 150
 
 [time]
 # Sleep after number of seconds.
-sleep_after = 1200
+sleep_after = 60
 
 # Minimum time in seconds to stay online when server is started.
 minimum_online_time = 60
@@ -90,7 +90,7 @@ minimum_online_time = 60
 # Read about all methods and configure them below.
 # Methods are used in order, if none is set, the client disconnects without a message.
 methods = [
-    "hold",
+#    "hold",
     "kick",
 ]
 

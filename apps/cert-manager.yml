@@ -17,18 +17,20 @@ spec:
       parameters:
       - name: crds.enabled
         value: 'true'
-      - name: resources
-        value:
-          requests: { cpu: 10m, memory: 64Mi }
-          limits: { cpu: 1000m, memory: 128Mi }
-      - name: cainjector.resources
-        value:
-          requests: { cpu: 10m, memory: 64Mi }
-          limits: { cpu: 1000m, memory: 128Mi }
-      - name: webhook.resources
-        value:
-          requests: { cpu: 10m, memory: 64Mi }
-          limits: { cpu: 1000m, memory: 128Mi }
+      - { name: resources.requests.cpu, value: 10m }
+      - { name: resources.limits.cpu, value: 1000m }
+      - { name: resources.requests.memory, value: 64Mi }
+      - { name: resources.limits.memory, value: 128Mi }
+
+      - { name: cainjector.resources.requests.cpu, value: 10m }
+      - { name: cainjector.resources.limits.cpu, value: 1000m }
+      - { name: cainjector.resources.requests.memory, value: 64Mi }
+      - { name: cainjector.resources.limits.memory, value: 128Mi }
+
+      - { name: webhook.resources.requests.cpu, value: 10m }
+      - { name: webhook.resources.limits.cpu, value: 1000m }
+      - { name: webhook.resources.requests.memory, value: 64Mi }
+      - { name: webhook.resources.limits.memory, value: 128Mi }
   syncPolicy:
     automated:
       prune: true

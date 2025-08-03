@@ -26,7 +26,10 @@ spec:
       name: letsencrypt-account-key
     solvers:
       - http01: { ingress: { ingressClassName: nginx } }
-      - dns01:
+      - selector:
+          dnsNames:
+          - '*.mon.enorme.uk'
+        dns01:
           cloudflare:
             apiTokenSecretRef:
               name: cloudflare-api-token-secret

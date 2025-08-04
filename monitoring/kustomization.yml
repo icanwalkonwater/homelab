@@ -23,7 +23,7 @@ images:
     newTag: 12.1.0
   - name: prometheus
     newName: docker.io/prom/prometheus
-    newTag: v3.3.0
+    newTag: v3.5.0
   - name: node-exporter
     newName: docker.io/prom/node-exporter
     newTag: v1.9.1

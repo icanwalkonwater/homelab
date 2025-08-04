@@ -4,7 +4,7 @@ kind: Kustomization
 
 namespace: local-path-provisioner
 resources:
-  - https://raw.githubusercontent.com/rancher/local-path-provisioner/v0.0.31/deploy/local-path-storage.yaml
+  - https://raw.githubusercontent.com/rancher/local-path-provisioner/v0.0.32/deploy/local-path-storage.yaml
   - storage-class.yml
 
 configMapGenerator:

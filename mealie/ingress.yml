@@ -37,6 +37,6 @@ spec:
         backend:
           service: { name: mealie, port: { number: 9000 } }
   tls:
+  # use default certificate
   - hosts:
     - '*.mon.enorme.uk'
-    secretName: mon-enorme-uk-tls

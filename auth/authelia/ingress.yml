@@ -40,6 +40,6 @@ spec:
             backend:
               service: { name: authelia, port: { name: http } }
   tls:
+  # use default certificate
     - hosts:
         - '*.mon.enorme.uk'
-      secretName: mon-enorme-uk-tls

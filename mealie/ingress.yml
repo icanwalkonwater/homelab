@@ -1,29 +1,7 @@
----
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: mealie
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt
-spec:
-  ingressClassName: nginx
-  rules:
-  - host: mealie.homelab.icanwalkonwater.dev
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service: { name: mealie, port: { number: 9000 } }
-  tls:
-  - hosts:
-    - mealie.homelab.icanwalkonwater.dev
-    secretName: mealie-tls
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: mealie2
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt
 spec:

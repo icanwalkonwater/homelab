@@ -24,12 +24,12 @@ spec:
           env:
             - { name: TZ, value: Europe/Paris }
             - { name: DB_ENGINE, value: sqlite }
-            - { name: BASE_URL, value: mealie.homelab.icanwalkonwater.dev }
+            - { name: BASE_URL, value: mange.mon.enorme.uk }
 
             # OIDC auth
             - { name: OIDC_AUTH_ENABLED, value: 'true' }
             - { name: OIDC_SIGNUP_ENABLED, value: 'true' }
-            - { name: OIDC_CONFIGURATION_URL, value: https://auth.homelab.icanwalkonwater.dev/.well-known/openid-configuration }
+            - { name: OIDC_CONFIGURATION_URL, value: https://identifie.mon.enorme.uk/.well-known/openid-configuration }
             - { name: OIDC_CLIENT_ID, value: mealie }
             - name: OIDC_CLIENT_SECRET
               valueFrom:

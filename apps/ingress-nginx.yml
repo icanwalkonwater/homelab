@@ -17,6 +17,8 @@ spec:
       parameters:
       - name: controller.extraArgs.enable-ssl-passthrough
         value: 'true'
+      - name: controller.extraArgs.default-ssl-certificate
+        value: cert-manager/mon-enorme-uk-tls
   syncPolicy:
     automated:
       prune: true

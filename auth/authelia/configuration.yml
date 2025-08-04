@@ -26,10 +26,13 @@ authentication_backend:
     disable: false
 
 session:
+  name: authelia_session
   cookies:
     - name: authelia_session
       domain: homelab.icanwalkonwater.dev
       authelia_url: https://auth.homelab.icanwalkonwater.dev
+    - domain: mon.enorme.uk
+      authelia_url: https://identifie.mon.enorme.uk
 
 storage:
   local:

@@ -23,8 +23,6 @@ spec:
           image: jellyfin
           env:
             - { name: TZ, value: Europe/Paris }
-            - { name: PUID, value: '1001' }
-            - { name: GUID, value: '1001' }
           ports:
             - { name: http, containerPort: 8096 }
             - { name: https, containerPort: 8920 }
@@ -45,3 +43,8 @@ spec:
           persistentVolumeClaim: { claimName: jellyfin-data-pvc }
         - name: media
           persistentVolumeClaim: { claimName: jellyfin-media-pvc }
+
+      securityContext:
+        runAsUser: 1001
+        runAsGroup: 1001
+        runAsNonRoot: true

@@ -7,6 +7,7 @@ This assumes that there is a LDAP user named `jellyfin` with read access as well
 - [ ] General / Server name: Lucasfilm
 - [ ] Plugins / LDAP Authentication: Install
 - [ ] Plugins / Kodi Sync Queue: Install
+- [ ] Wait for scan to end
 - [ ] Restart
 - [ ] My Plgins / LDAP Auth
   - [ ] LDAP Server: `lldap.auth.svc.cluster.local`

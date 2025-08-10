@@ -11,13 +11,6 @@ resources:
   - pv-data.yml
   - pv-media.yml
 
-# secretGenerator:
-#   - name: mealie-credentials
-#     options:
-#       disableNameSuffixHash: true
-#     envs:
-#       - mealie-credentials.env
-
 images:
   - name: jellyfin
     newName: ghcr.io/jellyfin/jellyfin

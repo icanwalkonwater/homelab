@@ -15,6 +15,7 @@
   boot.loader.efi.canTouchEfiVariables = true;
 
   networking.hostName = "coruscant"; # Define your hostname.
+  networking.enableIPv6 = true;
   # Pick only one of the below networking options.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
   # networking.networkmanager.enable = true;  # Easiest to use and most distros use this by default.
@@ -38,6 +39,9 @@
       neovim
       tree
       zellij
+      tmux
+      htop
+      aria2
     ];
   };
 
@@ -49,10 +53,26 @@
   services.openssh.enable = true;
 
   # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
+  networking.firewall.allowedTCPPorts = [
+    22 # SSH
+    80 # HTTP
+    443 # HTTPS
+    6443 # K3s API Server
+    # 10250
+  ];
+  networking.firewall.allowedUDPPorts = [
+    8472 # K3s Flannel
+    # 51820
+    # 51821
+  ];
+  networking.firewall.extraCommands = builtins.concatStringsSep "\n" [
+    "iptables -A OUTPUT -p tcp -s 10.42.0.0/16 -j ACCEPT" # K3s pod traffic
+    "ip6tables -A OUTPUT -p tcp -s 2001:db8:42::/56 -j ACCEPT" # K3s pod traffic
+    "iptables -A OUTPUT -p tcp -s 10.43.0.0/16 -j ACCEPT" # K3s services traffic
+    "ip6tables -A OUTPUT -p tcp -s 2001:db8:43::/112 -j ACCEPT" # K3s services traffic
+  ];
   # Or disable the firewall altogether.
-  networking.firewall.enable = false;
+  # networking.firewall.enable = false;
 
   # Copy the NixOS configuration file and link it from the resulting system
   # (/run/current-system/configuration.nix). This is useful in case you
@@ -125,18 +145,24 @@
     };
   };
 
+  networking.wireguard.enable = true;
   services.k3s = {
     enable = true;
     role = "server";
-    clusterInit = true;
-    extraFlags = builtins.concatStringsSep " " [
-    	"--data-dir=/var/lib/rancher/k3s"
-        "--etcd-snapshot-dir=/mnt/lucastrunk/@k3s/@etcd-snapshots"
-        "--disable-cloud-controller"
-        "--disable=local-storage,traefik"
-        # "--cluster-cidr=10.42.0.0/16,2001:cafe:42::/56"
-        # "--service-cidr=10.43.0.0/16,2001:cafe:43::/112"
+    clusterInit = false; # Keep using sqlite instead of HA etcd
+    gracefulNodeShutdown.enable = true;
+    extraFlags = toString [
+      "--flannel-backend=wireguard-native"
+      # "--flannel-ipv6-masq"
+      "--data-dir=/var/lib/rancher/k3s"
+      # "--etcd-snapshot-dir=/mnt/lucastrunk/@k3s/@etcd-snapshots"
+      "--disable-cloud-controller"
+      "--disable=local-storage,traefik"
+      "--cluster-cidr=10.42.0.0/16"
+      "--service-cidr=10.43.0.0/16"
+      # "--cluster-cidr=10.42.0.0/16,2001:db8:42::/56"
+      # "--service-cidr=10.43.0.0/16,2001:db8:43::/112"
+      # "--kubelet-arg='node-ip=0.0.0.0'"
     ];
-    # --default-local-storage-path
   };
 }

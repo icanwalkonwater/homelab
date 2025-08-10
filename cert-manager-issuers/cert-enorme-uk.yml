@@ -9,4 +9,5 @@ spec:
     name: letsencrypt
     kind: ClusterIssuer
   dnsNames:
+    - 'mon.enorme.uk'
     - '*.mon.enorme.uk'

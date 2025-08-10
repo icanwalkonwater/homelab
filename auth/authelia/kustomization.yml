@@ -4,12 +4,21 @@ kind: Kustomization
 
 namespace: auth
 resources:
-  - statefulset.yml
+  - deployment.yml
   - service.yml
   - ingress.yml
-  - authelia-credentials.yml
+  - pv.yml
 
 configMapGenerator:
   - name: authelia-config
     files:
       - configuration.yml
+
+secretGenerator:
+  - name: authelia-credentials
+    options:
+      disableNameSuffixHash: true
+    envs:
+      - authelia-credentials.env
+    files:
+      - OIDC_JWK_KEY=authelia-oidc-jwk-key.pem

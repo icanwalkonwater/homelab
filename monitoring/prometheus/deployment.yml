@@ -1,6 +1,6 @@
 ---
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Deployment
 metadata:
   name: prometheus
   labels:
@@ -11,7 +11,7 @@ spec:
       app.kubernetes.io/name: prometheus
   replicas: 1
   revisionHistoryLimit: 2
-  serviceName: prometheus
+  strategy: { type: Recreate }
 
   template:
     metadata:
@@ -31,7 +31,7 @@ spec:
               mountPath: /etc/prometheus/prometheus.yml
               subPath: prometheus.yml
               readOnly: true
-            - name: storage
+            - name: data
               mountPath: /prometheus
           resources:
             requests: { cpu: 100m, memory: 250Mi }
@@ -40,18 +40,7 @@ spec:
         - name: config
           configMap:
             name: prometheus-cm
-            items:
-              - { key: prometheus.yml, path: prometheus.yml }
+            items: [{ key: prometheus.yml, path: prometheus.yml }]
+        - name: data
+          persistentVolumeClaim: { claimName: prometheus-data-pvc }
       serviceAccountName: prometheus
-
-  persistentVolumeClaimRetentionPolicy:
-    whenDeleted: Retain
-    whenScaled: Retain
-  volumeClaimTemplates:
-    - metadata:
-        name: storage
-      spec:
-        accessModes: [ReadWriteOncePod]
-        storageClassName: local-path-slow
-        resources:
-          requests: { storage: 100Gi }

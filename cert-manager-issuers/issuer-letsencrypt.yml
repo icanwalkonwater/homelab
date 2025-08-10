@@ -7,12 +7,14 @@ spec:
   acme:
     email: lucas.malandrino@gmail.com
     server: https://acme-staging-v02.api.letsencrypt.org/directory
-    privateKeySecretRef:
-      name: letsencrypt-staging-account-key
+    privateKeySecretRef: { name: letsencrypt-staging-account-key }
     solvers:
-      - http01:
-          ingress:
-            ingressClassName: nginx
+      - http01: { ingress: { ingressClassName: nginx } }
+      - selector:
+          dnsNames: ['*.mon.enorme.uk']
+        dns01:
+          cloudflare:
+            apiTokenSecretRef: { name: cloudflare-api-token, key: API_TOKEN }
 ---
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
@@ -22,15 +24,11 @@ spec:
   acme:
     email: lucas.malandrino@gmail.com
     server: https://acme-v02.api.letsencrypt.org/directory
-    privateKeySecretRef:
-      name: letsencrypt-account-key
+    privateKeySecretRef: { name: letsencrypt-account-key }
     solvers:
       - http01: { ingress: { ingressClassName: nginx } }
       - selector:
-          dnsNames:
-          - '*.mon.enorme.uk'
+          dnsNames: ['*.mon.enorme.uk']
         dns01:
           cloudflare:
-            apiTokenSecretRef:
-              name: cloudflare-api-token
-              key: api-token
+            apiTokenSecretRef: { name: cloudflare-api-token, key: API_TOKEN }

@@ -3,12 +3,10 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: grafana
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt
 spec:
   ingressClassName: nginx
   rules:
-  - host: grafana.homelab.icanwalkonwater.dev
+  - host: admire.mon.enorme.uk
     http:
       paths:
       - path: /
@@ -16,6 +14,6 @@ spec:
         backend:
           service: { name: grafana, port: { number: 3000 } }
   tls:
+  # use default TLS certificate
   - hosts:
-    - grafana.homelab.icanwalkonwater.dev
-    secretName: grafana-tls
+    - '*.mon.enorme.uk'

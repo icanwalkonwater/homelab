@@ -13,5 +13,11 @@ generatorOptions:
 namespace: cert-manager
 resources:
   - issuer-letsencrypt.yml
-  - cloudflare-credentials.yml
   - cert-enorme-uk.yml
+
+secretGenerator:
+  - name: cloudflare-api-token
+    options:
+      disableNameSuffixHash: true
+    envs:
+      - cloudflare-api-token.env

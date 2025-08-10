@@ -1,0 +1,26 @@
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: cert-manager
+spec:
+  repo: https://charts.jetstack.io
+  chart: cert-manager
+  version: v1.18.2
+  targetNamespace: cert-manager
+  createNamespace: true
+  valuesContent: |-
+    crds:
+      enabled: true
+
+    resources:
+      requests: { cpu: 10m, memory: 64Mi }
+      limits: { cpu: 1000m, memory: 128Mi }
+    cainjector:
+      resources:
+        requests: { cpu: 10m, memory: 64Mi }
+        limits: { cpu: 1000m, memory: 128Mi }
+    webhook:
+      resources:
+        requests: { cpu: 10m, memory: 64Mi }
+        limits: { cpu: 1000m, memory: 128Mi }

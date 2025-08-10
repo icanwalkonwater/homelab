@@ -1,6 +1,6 @@
 ---
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Deployment
 metadata:
   name: authelia
 spec:
@@ -9,7 +9,7 @@ spec:
       app.kubernetes.io/name: authelia
   replicas: 1
   revisionHistoryLimit: 2
-  serviceName: authelia
+  strategy: { type: Recreate }
 
   template:
     metadata:
@@ -26,18 +26,18 @@ spec:
           env:
             - { name: PUID, value: '1000' }
             - { name: PGID, value: '1000' }
-            
+
             # Secrets
             - name: AUTHELIA_SESSION_SECRET_FILE
-              value: /config/creds/session-secret.txt
+              value: /var/run/secrets/icanwalkonwater.dev/session-secret.txt
             - name: AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET_FILE
-              value: /config/creds/reset-password-jwt-secret.txt
+              value: /var/run/secrets/icanwalkonwater.dev/reset-password-jwt-secret.txt
             - name: AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE
-              value: /config/creds/storage-encryption-key.txt
+              value: /var/run/secrets/icanwalkonwater.dev/storage-encryption-key.txt
             - name: AUTHELIA_AUTHENTICATION_BACKEND_LDAP_PASSWORD_FILE
-              value: /config/creds/ldap-password.txt
+              value: /var/run/secrets/icanwalkonwater.dev/ldap-password.txt
             - name: AUTHELIA_IDENTITY_PROVIDERS_OIDC_HMAC_SECRET_FILE
-              value: /config/creds/oidc-hmac-secret.txt
+              value: /var/run/secrets/icanwalkonwater.dev/oidc-hmac-secret.txt
 
             - { name: TZ, value: Europe/Paris }
           ports:
@@ -48,12 +48,9 @@ spec:
               subPath: configuration.yml
               readOnly: true
             - name: credentials
-              mountPath: /config/creds
+              mountPath: /var/run/secrets/icanwalkonwater.dev
               readOnly: true
-            - name: certificate
-              mountPath: /config/certs
-              readOnly: true
-            - name: storage
+            - name: data
               mountPath: /data
           resources:
             limits:
@@ -66,18 +63,12 @@ spec:
         - name: credentials
           secret:
             secretName: authelia-credentials
-        - name: certificate
-          secret:
-            secretName: authelia-tls
-
-  persistentVolumeClaimRetentionPolicy:
-    whenDeleted: Retain
-    whenScaled: Retain
-  volumeClaimTemplates:
-    - metadata:
-        name: storage
-      spec:
-        accessModes: [ReadWriteOncePod]
-        storageClassName: local-path-fast
-        resources:
-          requests: { storage: 1Gi }
+            items:
+              - { key: SESSION_SECRET, path: session-secret.txt }
+              - { key: RESET_PASSWORD_JWT_SECRET, path: reset-password-jwt-secret.txt }
+              - { key: STORAGE_ENCRYPTION_KEY, path: storage-encryption-key.txt }
+              - { key: LDAP_PASSWORD, path: ldap-password.txt }
+              - { key: OIDC_HMAC_SECRET, path: oidc-hmac-secret.txt }
+              - { key: OIDC_JWK_KEY, path: oidc-jwk-key.pem }
+        - name: data
+          persistentVolumeClaim: { claimName: authelia-data-pvc }

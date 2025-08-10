@@ -8,10 +8,11 @@ labels:
 
 resources:
   - rbac.yml
-  - statefulset.yml
+  - deployment.yml
   - service.yml
+  - pv.yml
 
 configMapGenerator:
   - name: prometheus-cm
     files:
-      - data/prometheus.yml
+      - prometheus.yml

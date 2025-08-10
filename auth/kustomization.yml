@@ -4,13 +4,14 @@ kind: Kustomization
 
 namespace: auth
 resources:
+  - namespace.yml
   - lldap
   - authelia
 
 images:
   - name: lldap
     newName: ghcr.io/lldap/lldap
-    newTag: 2025-07-29-alpine-rootless
+    newTag: 2025-08-06-alpine-rootless
   - name: authelia
     newName: ghcr.io/authelia/authelia
-    newTag: 4.39.5
+    newTag: 4.39.6

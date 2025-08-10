@@ -4,6 +4,13 @@ kind: Kustomization
 
 namespace: auth
 resources:
-  - statefulset.yml
+  - deployment.yml
   - service.yml
-  - lldap-credentials.yml
+  - pv.yml
+
+secretGenerator:
+  - name: lldap-credentials
+    options:
+      disableNameSuffixHash: true
+    envs:
+      - lldap-credentials.env

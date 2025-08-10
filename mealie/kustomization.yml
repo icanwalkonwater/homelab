@@ -4,10 +4,18 @@ kind: Kustomization
 
 namespace: mealie
 resources:
-  - statefulset.yml
+  - namespace.yml
+  - deployment.yml
   - service.yml
   - ingress.yml
-  - oidc-credentials.yml
+  - pv.yml
+
+secretGenerator:
+  - name: mealie-credentials
+    options:
+      disableNameSuffixHash: true
+    envs:
+      - mealie-credentials.env
 
 images:
   - name: mealie

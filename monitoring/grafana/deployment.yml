@@ -9,6 +9,9 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: grafana
+  replicas: 1
+  strategy: {type: Recreate}
+
   template:
     metadata:
       labels:
@@ -18,23 +21,22 @@ spec:
         - name: grafana
           image: grafana
           env:
-            - { name: GF_SERVER_ROOT_URL, value: https://grafana.homelab.icanwalkonwater.dev }
+            - { name: GF_SERVER_ROOT_URL, value: https://admire.mon.enorme.uk }
             - { name: GF_SECURITY_DISABLE_INITIAL_ADMIN_CREATION, value: 'true' }
             - { name: GF_AUTH_GENERIC_OAUTH_ENABLED, value: 'true' }
             - { name: GF_AUTH_GENERIC_OAUTH_NAME, value: Authelia }
             - { name: GF_AUTH_GENERIC_OAUTH_ICON, value: signin }
             - { name: GF_AUTH_GENERIC_OAUTH_CLIENT_ID, value: grafana }
+            - { name: GF_AUTH_GENERIC_OAUTH_AUTH_STYLE, value: InHeader }
             - name: GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET
               valueFrom:
-                secretKeyRef:
-                  name: grafana-oidc-credentials
-                  key: client-secret
+                secretKeyRef: {name: grafana-credentials, key: OIDC_CLIENT_SECRET}
             - { name: GF_AUTH_GENERIC_OAUTH_SCOPES, value: 'openid profile groups email' }
             - { name: GF_AUTH_GENERIC_OAUTH_EMPTY_SCOPES, value: 'false' }
             - { name: GF_AUTH_GENERIC_OAUTH_AUTO_LOGIN, value: 'true' }
-            - { name: GF_AUTH_GENERIC_OAUTH_AUTH_URL, value: https://auth.homelab.icanwalkonwater.dev/api/oidc/authorization }
-            - { name: GF_AUTH_GENERIC_OAUTH_TOKEN_URL, value: https://auth.homelab.icanwalkonwater.dev/api/oidc/token }
-            - { name: GF_AUTH_GENERIC_OAUTH_API_URL, value: https://auth.homelab.icanwalkonwater.dev/api/oidc/userinfo }
+            - { name: GF_AUTH_GENERIC_OAUTH_AUTH_URL, value: https://identifie.mon.enorme.uk/api/oidc/authorization }
+            - { name: GF_AUTH_GENERIC_OAUTH_TOKEN_URL, value: https://identifie.mon.enorme.uk/api/oidc/token }
+            - { name: GF_AUTH_GENERIC_OAUTH_API_URL, value: https://identifie.mon.enorme.uk/api/oidc/userinfo }
             - { name: GF_AUTH_GENERIC_OAUTH_LOGIN_ATTRIBUTE_PATH, value: preferred_username }
             - { name: GF_AUTH_GENERIC_OAUTH_GROUPS_ATTRIBUTE_PATH, value: groups }
             - { name: GF_AUTH_GENERIC_OAUTH_NAME_ATTRIBUTE_PATH, value: name }
@@ -46,23 +48,27 @@ spec:
           ports:
             - { name: http, containerPort: 3000 }
           volumeMounts:
-            - name: provision-prometheus
-              mountPath: /etc/grafana/provisioning/datasources/prometheus.yml
-              subPath: prometheus.yml
+            - name: provision-datasources
+              mountPath: /etc/grafana/provisioning/datasources/homelab-datasources.yml
+              subPath: homelab-datasources.yml
               readOnly: true
-            - name: provision-dashboards
-              mountPath: /etc/grafana/provisioning/dashboards
+            - name: provision-dashboard-providers
+              mountPath: /etc/grafana/provisioning/dashboards/homelab-dashboards.yml
+              subPath: homelab-dashboards.yml
               readOnly: true
+            - name: provision-dashboards-homelab
+              mountPath: /etc/grafana/provisioning/dashboards/homelab
+              readOnly: true
+            - name: data
+              mountPath: /var/lib/grafana
 
           resources:
-            limits: { cpu: 250m, memory: 500Mi }
+            requests: { cpu: 250m, memory: 500Mi }
+            limits: { cpu: 1000m, memory: 500Mi }
 
           readinessProbe:
             failureThreshold: 3
-            httpGet:
-              path: /robots.txt
-              port: 3000
-              scheme: HTTP
+            httpGet: {path: /robots.txt, port: 3000, scheme: HTTP}
             initialDelaySeconds: 30
             periodSeconds: 30
             successThreshold: 1
@@ -75,20 +81,19 @@ spec:
             successThreshold: 1
             timeoutSeconds: 1
       volumes:
-        - name: provision-prometheus
+        - name: provision-datasources
           configMap:
-            name: grafana-config-cm
-            items:
-              - key: datasource-prometheus.yml
-                path: prometheus.yml
-        - name: provision-dashboards
+            name: grafana-providers-cm
+            items: [{key: homelab-datasources.yml, path: homelab-datasources.yml}]
+        - name: provision-dashboard-providers
           configMap:
-            name: grafana-config-cm
-            items:
-              - key: dashboard.yml
-                path: dashboard.yml
-              - key: dashboard.json
-                path: dashboard.json
+            name: grafana-providers-cm
+            items: [{key: homelab-dashboards.yml, path: homelab-dashboards.yml}]
+        - name: provision-dashboards-homelab
+          configMap:
+            name: grafana-dashboards-homelab-cm
+        - name: data
+          persistentVolumeClaim: {claimName: grafana-data-pvc}
       securityContext:
         fsGroup: 472
         supplementalGroups: [0]

@@ -2,14 +2,23 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-- deployment.yml
-- service.yml
-- ingress.yml
-- oidc-credentials.yml
+  - deployment.yml
+  - service.yml
+  - ingress.yml
+  - pv.yml
 
 configMapGenerator:
-- name: grafana-config-cm
-  files:
-    - data/datasource-prometheus.yml
-    - data/dashboard.yml
-    - data/dashboard.json
+  - name: grafana-providers-cm
+    files:
+      - provisioning/homelab-datasources.yml
+      - provisioning/homelab-dashboards.yml
+  - name: grafana-dashboards-homelab-cm
+    files:
+      - provisioning/dashboards/overview.json
+
+secretGenerator:
+  - name: grafana-credentials
+    options:
+      disableNameSuffixHash: true
+    envs:
+      - grafana-credentials.env

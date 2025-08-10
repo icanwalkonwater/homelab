@@ -9,29 +9,6 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: auth.homelab.icanwalkonwater.dev
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service: { name: authelia, port: { name: http } }
-  tls:
-    - hosts:
-        - authelia.homelab.icanwalkonwater.dev
-        - auth.homelab.icanwalkonwater.dev
-      secretName: authelia-tls
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: authelia2
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt
-    nginx.ingress.kubernetes.io/enable-cors: 'true'
-spec:
-  ingressClassName: nginx
-  rules:
     - host: identifie.mon.enorme.uk
       http:
         paths:

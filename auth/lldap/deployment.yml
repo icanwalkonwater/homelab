@@ -1,6 +1,6 @@
 ---
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Deployment
 metadata:
   name: lldap
   labels:
@@ -11,7 +11,7 @@ spec:
       app.kubernetes.io/name: lldap
   replicas: 1
   revisionHistoryLimit: 2
-  serviceName: lldap
+  strategy: { type: Recreate }
 
   template:
     metadata:
@@ -26,41 +26,25 @@ spec:
             - { name: LLDAP_LDAP_BASE_DN, value: 'dc=homelab,dc=icanwalkonwater,dc=dev' }
             - name: LLDAP_LDAP_USER_PASS
               valueFrom:
-                secretKeyRef:
-                  name: lldap-credentials
-                  key: admin-password.txt
+                secretKeyRef: { name: lldap-credentials, key: ADMIN_PASSWORD }
             - name: LLDAP_JWT_SECRET
               valueFrom:
-                secretKeyRef:
-                  name: lldap-credentials
-                  key: jwt-secret.txt
+                secretKeyRef: { name: lldap-credentials, key: JWT_SECRET }
             - name: LLDA_KEY_SEED
               valueFrom:
-                secretKeyRef:
-                  name: lldap-credentials
-                  key: key-seed.txt
+                secretKeyRef: { name: lldap-credentials, key: KEY_SEED }
             - { name: TZ, value: Europe/Paris }
           ports:
             - { name: ldap, containerPort: 3890 }
             - { name: ldaps, containerPort: 6360 }
             - { name: http, containerPort: 17170 }
           volumeMounts:
-            - name: storage
+            - name: data
               mountPath: /data
           resources:
             limits:
               cpu: 1000m
               memory: 128Mi
-
-  persistentVolumeClaimRetentionPolicy:
-    whenDeleted: Retain
-    whenScaled: Retain
-  volumeClaimTemplates:
-    - metadata:
-        name: storage
-      spec:
-        accessModes: [ReadWriteOncePod]
-        storageClassName: local-path-fast
-        resources:
-          requests:
-            storage: 1Gi
+      volumes:
+        - name: data
+          persistentVolumeClaim: { claimName: lldap-data-pvc }

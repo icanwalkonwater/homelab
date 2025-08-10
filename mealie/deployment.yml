@@ -1,6 +1,6 @@
 ---
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Deployment
 metadata:
   name: mealie
   labels:
@@ -11,7 +11,7 @@ spec:
       app.kubernetes.io/name: mealie
   replicas: 1
   revisionHistoryLimit: 2
-  serviceName: mealie
+  strategy: { type: Recreate }
 
   template:
     metadata:
@@ -25,36 +25,29 @@ spec:
             - { name: TZ, value: Europe/Paris }
             - { name: DB_ENGINE, value: sqlite }
             - { name: BASE_URL, value: mange.mon.enorme.uk }
+            - { name: ALLOW_PASSWORD_LOGIN, value: 'false' }
 
             # OIDC auth
             - { name: OIDC_AUTH_ENABLED, value: 'true' }
-            - { name: OIDC_SIGNUP_ENABLED, value: 'true' }
+            - { name: OIDC_PROVIDER_NAME, value: Authelia }
             - { name: OIDC_CONFIGURATION_URL, value: https://identifie.mon.enorme.uk/.well-known/openid-configuration }
             - { name: OIDC_CLIENT_ID, value: mealie }
             - name: OIDC_CLIENT_SECRET
               valueFrom:
-                secretKeyRef:
-                  name: mealie-oidc-credentials
-                  key: client-secret
-            - { name: OIDC_AUTO_REDIRECT, value: 'false' }
+                secretKeyRef: { name: mealie-credentials, key: OIDC_CLIENT_SECRET }
+            - { name: OIDC_SIGNUP_ENABLED, value: 'true' }
+            - { name: OIDC_AUTO_REDIRECT, value: 'true' }
+            - { name: OIDC_NAME_CLAIM, value: preferred_username }
             - { name: OIDC_ADMIN_GROUP, value: mealie.admin }
             - { name: OIDC_USER_GROUP, value: mealie.user }
           ports:
             - { name: http, containerPort: 9000 }
           volumeMounts:
-            - name: storage
+            - name: data
               mountPath: /app/data
           resources:
             limits: { cpu: 1000m, memory: 512Mi }
 
-  persistentVolumeClaimRetentionPolicy:
-    whenDeleted: Retain
-    whenScaled: Retain
-  volumeClaimTemplates:
-    - metadata:
-        name: storage
-      spec:
-        accessModes: [ReadWriteOncePod]
-        storageClassName: local-path-fast
-        resources:
-          requests: { storage: 1Gi }
+      volumes:
+        - name: data
+          persistentVolumeClaim: { claimName: mealie-data-pvc }

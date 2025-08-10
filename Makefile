@@ -11,9 +11,11 @@ up:
 	kubectl apply -k auth
 	kubectl apply -k monitoring
 	kubectl apply -k mealie
+	kubectl apply -k jellyfin
 
 .PHONY: down
 down:
+	kubectl delete -k jellyfin
 	kubectl delete -k mealie
 	kubectl delete -k monitoring
 	kubectl delete -k auth

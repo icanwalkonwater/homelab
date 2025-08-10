@@ -1,9 +1,0 @@
-services:
-  jellyfin:
-    image: jellyfin/jellyfin
-    user: 1000:1000
-    ports:
-      - 8096:8096
-      - 8920:8920
-    volumes:
-      - /run/media/lucas/fastass/jellyfin_test:/media:ro

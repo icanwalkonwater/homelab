@@ -60,6 +60,7 @@ spec:
         - name: config
           configMap:
             name: authelia-config
+            items: [{ key: configuration.yml, path: configuration.yml }]
         - name: credentials
           secret:
             secretName: authelia-credentials

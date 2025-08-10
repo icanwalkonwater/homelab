@@ -1,0 +1,47 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jellyfin
+  labels:
+    app.kubernetes.io/name: jellyfin
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: jellyfin
+  replicas: 1
+  revisionHistoryLimit: 2
+  # strategy: { type: Recreate }
+
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: jellyfin
+    spec:
+      containers:
+        - name: jellyfin
+          image: jellyfin
+          env:
+            - { name: TZ, value: Europe/Paris }
+            - { name: PUID, value: '1001' }
+            - { name: GUID, value: '1001' }
+          ports:
+            - { name: http, containerPort: 8096 }
+            - { name: https, containerPort: 8920 }
+            - { name: discovery, protocol: UDP, containerPort: 7359 }
+            - { name: dnla, protocol: UDP, containerPort: 1900 }
+          volumeMounts:
+            - name: data
+              mountPath: /config
+            - name: media
+              mountPath: /data
+              readOnly: true
+          resources:
+            requests: { cpu: 1000m, memory: 1Gi }
+            limits: { cpu: 10000m, memory: 8Gi }
+
+      volumes:
+        - name: data
+          persistentVolumeClaim: { claimName: jellyfin-data-pvc }
+        - name: media
+          persistentVolumeClaim: { claimName: jellyfin-media-pvc }

@@ -13,21 +13,27 @@ There are currently 2 nodes:
 
 Needs a working k3s cluster without traefik or local-storage.
 
-The cluster is fully managed by `argocd` but first we need to manually install the first time, and then it can manage itself and the rest of the cluster:
+You will need to look for the varous env files and fill them with various keys.
+You can just generate random stuff for most of them.
+
+You can find them all using:
 ```bash
-kubeclt apply -k argocd
+find * -name '*.sample'
+```
+
+Once all secrets are in place, setup your `KUBECONFIG` env variable to have a working `kubectl`, then:
+```bash
+make up
 ```
 
 Overview of the main components:
-- `argocd`: for managing the cluster in a declarative way.
 - `ingress-nginx`: as Ingress controller.
 - `cert-manager`: with Lets encrpyt as issuer to manage TLS certificates.
-- `local-path-provisioner`: allows the dynamic creation of PVs without complicated distributed storage.
-- `sealed-secrets`: to safely store secrets in this public repo in an encrypted way.
 - `lldap`+`authelia`: for authentification and securing apps.
+    - TODO: don't hardcode OIDC client hashes in the config
 - `prometheus`+`node-exporter`+`grafana`: as the basic monitoring stack.
 
 Apps installed:
 - `mealie`: cooking recipes database.
-- `octoprint`: for managing my 3D printer remotely.
-- `minecraft-gtnh`: a GregTech: New Horizons minecraft modded server.
+- (NOT WORKING) `octoprint`:  for managing my 3D printer remotely.
+- (NOT WORKING) `minecraft-gtnh`: a GregTech: New Horizons minecraft modded server.

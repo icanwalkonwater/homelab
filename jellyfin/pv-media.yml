@@ -5,7 +5,7 @@ metadata:
   name: jellyfin-media-pv
 spec:
   local:
-    path: /mnt/lucastrunk/@media/@storage
+    path: /mnt/lucastrunk/@media
   capacity: { storage: 1000G }
   accessModes: [ReadOnlyMany]
   storageClassName: ''

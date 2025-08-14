@@ -14,7 +14,7 @@ def "main mass" [...files: string] {
   print ($out | update filename {path basename})
 }
 
-def main [file: string, --target-base-dir: string] {
+def "main single" [file: string, --target-base-dir: string] {
   if not ($file | path exists) {
     print "This file doesn't exists"
     exit 1
@@ -50,6 +50,42 @@ def main [file: string, --target-base-dir: string] {
 
   ^wl-copy $cmd_cleanup
   ['Continue'] | input list $"Copied: ($cmd_cleanup)"
+}
+
+def "main season" [target_dir: string] {
+  if not ($target_dir | path exists) {
+    print "This target doesn't exist"
+    exit 1
+  }
+  if ($target_dir | path type) != 'dir' {
+    print "Target isn't a directory"
+    exit 1
+  }
+
+  let target_dir = $target_dir | path expand
+
+  let media = $target_dir | path dirname | parse-medianame
+  let media = (input --default $media "Media: ")
+  let year = $target_dir | path dirname | parse-year
+  let year = (input --default $year "Year: ")
+
+  let items = ls $target_dir | get name | each {parse-season-item $in --prefix $media}
+
+  let data = {
+    media: $media
+    year: $year
+    items: $items
+    target_dir: $target_dir
+  }
+
+  print ($data | update items {update filename {path basename}} | table --expand)
+
+  print ($items | each {$"mv \"($in.filename | str replace '"' '\"')\" '($target_dir)/($in.target_file_name)'"} | str join "\n")
+}
+
+def main [] {
+  print "See --help"
+  exit 1
 }
 
 def parse-all [file: string, --interactive] {
@@ -107,9 +143,35 @@ def parse-all [file: string, --interactive] {
   { ...$data, target_dir_name: $target_dir_name, target_file_name: $target_file_name  }
 }
 
+def parse-season-item [file: string --prefix: string] {
+  let data = {
+    filename: $file,
+    ep: ($file | parse-ep),
+    resolution: ($file | parse-resolution),
+    rip: ($file | parse-rip),
+    hdr: ($file | parse-hdr),
+    codec: ($file | parse-codec),
+    ext: ($file | parse-ext)
+  }
+
+  mut target_file_name = $prefix + '.' + $data.ep + '-'
+
+  $target_file_name += $data.resolution + '.'
+  if ($data.rip | is-not-empty) {
+    $target_file_name += $data.rip + '.'
+  }
+  if ($data.hdr | is-not-empty) {
+    $target_file_name += $data.hdr + '.'
+  }
+  $target_file_name += $data.codec + '.'
+  $target_file_name += $data.ext
+
+  { ...$data, target_file_name: $target_file_name }
+}
+
 def parse-medianame []: string -> string {
   path basename
-    | parse --regex '^(?<name>.+)[^a-zA-Z0-9](?<year>[12]\d{3}\)?)[^a-zA-Z0-9]'
+    | parse --regex '^(?<name>.+)[^a-zA-Z0-9](?<year>[12]\d{3}\)?)(?:[^a-zA-Z0-9]|$)'
     | get -o 0.name
     | default ''
 }
@@ -117,7 +179,7 @@ def parse-medianame []: string -> string {
 # Actually the exact same regex as the name
 def parse-year []: string -> string {
   path basename
-    | parse --regex '^(?<name>.+)[^a-zA-Z0-9](?<year>[12]\d{3}\)?)[^a-zA-Z0-9]'
+    | parse --regex '^(?<name>.+)[^a-zA-Z0-9](?<year>[12]\d{3}\)?)(?:[^a-zA-Z0-9]|$)'
     | get -o 0.year
     | default ''
 }
@@ -132,11 +194,12 @@ def parse-resolution []: string -> string {
 
 def parse-rip []: string -> string {
   path basename
-    | parse --regex '(?i)[^a-zA-Z0-9](?<rip>blu-?ray|[a-z]+rip|web[a-z-]*|h?dts)[^a-zA-Z0-9]'
+    | parse --regex '(?i)[^a-zA-Z0-9](?<rip>blu-?ray|[a-z]+rip|web[a-z-]*|h?dts|hdtv)[^a-zA-Z0-9]'
     | get -o 0.rip
     | default ''
     | str replace --regex '(?i)blu-?ray' 'BluRay'
     | str replace --regex '(?i)web-?dl' 'WEBDL'
+    | str replace --regex '(?i)web' 'WEB'
 }
 
 def parse-hdr []: string -> string {
@@ -152,15 +215,22 @@ def parse-codec []: string -> string {
     | parse --regex '(?i)[^a-zA-Z0-9](?<codec>[hx]\.?26[456]|av1|avc|hevc)[^a-zA-Z0-9]'
     | get -o 0.codec
     | default ''
-    | str replace --regex '(?i)[hx]\.?264' 'AVC'
-    | str replace --regex '(?i)[hx]\.?265' 'HEVC'
-    | str replace --regex '(?i)av1' 'AV1'
+    | str upcase
+    | str replace --regex '[HX]\.?264' 'AVC'
+    | str replace --regex '[HX]\.?265' 'HEVC'
 }
 
 def parse-ext []: string -> string {
   parse --regex '(?i)\.(?<ext>[a-zA-Z0-9]+)$'
     | get 0.ext
     | str downcase
+}
+
+def parse-ep []: string -> string {
+  parse --regex '[^a-zA-Z0-9](?<ep>[sS]\d{1,2}[^0-9]?[eE]\d{1,2})[^a-zA-Z0-9]'
+    | get 0.ep
+    | str upcase
+    | str replace --regex '[^0-9SE]' ''
 }
 
 # vim: set tabstop=2 shiftwidth=2 expandtab :

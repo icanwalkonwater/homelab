@@ -36,10 +36,10 @@ def main [file: string, --target-base-dir: string] {
 
   let target_base_dir = $target_base_dir | default ($file | path dirname)
 
-  let target_dir = $"($target_base_dir)/($data.media_name)"
+  let target_dir = $"($target_base_dir)/($data.target_dir_name)"
 
   let cmd_mkdir = $"mkdir -p '($target_dir)'"
-  let cmd_ln = $"ln '($file)' '($target_dir)/($data.target_name)'"
+  let cmd_ln = $"ln '($file)' '($target_dir)/($data.target_file_name)'"
   let cmd_cleanup = $"rm '($file)'"
 
   ^wl-copy $cmd_mkdir
@@ -56,6 +56,7 @@ def parse-all [file: string, --interactive] {
   let data = {
     filename: $file
     media_name: ($file | parse-medianame)
+    year: ($file | parse-year)
     extra: ''
     resolution: ($file | parse-resolution)
     rip: ($file | parse-rip)
@@ -68,6 +69,7 @@ def parse-all [file: string, --interactive] {
     {
       filename: $data.filename
       media_name: (input --default $data.media_name "Media name: ")
+      year: (input --default $data.year "Year: ")
       extra: (input "Extra: ")
       resolution: (input --default $data.resolution "Resolution: ")
       rip: (input --default $data.rip "Rip: ")
@@ -79,30 +81,44 @@ def parse-all [file: string, --interactive] {
     $data
   }
 
-  mut target_name = $data.media_name
+  mut target_base = $data.media_name
+  if ($data.year | is-not-empty) {
+    $target_base += '.' + $data.year
+  }
+
+  mut target_dir_name = $target_base
+  mut target_file_name = $target_base + '-'
+
   if ($data.extra | is-not-empty) {
-    $target_name += '.' + $data.extra
+    $target_file_name += $data.extra + '.'
   }
   if ($data.resolution | is-not-empty) {
-    $target_name += '.' + $data.resolution
+    $target_file_name += $data.resolution + '.'
   }
   if ($data.rip | is-not-empty) {
-    $target_name += '.' + $data.rip
+    $target_file_name += $data.rip + '.'
   }
   if ($data.hdr | is-not-empty) {
-    $target_name += '.' + $data.hdr
+    $target_file_name += $data.hdr + '.'
   }
-  $target_name += '.' + $data.codec
-  $target_name += '.' + $data.ext
+  $target_file_name += $data.codec + '.'
+  $target_file_name += $data.ext
 
-
-  { ...$data, target_name: $target_name  }
+  { ...$data, target_dir_name: $target_dir_name, target_file_name: $target_file_name  }
 }
 
 def parse-medianame []: string -> string {
   path basename
-    | parse --regex '^(?<name>.+[^a-zA-Z0-9][12]\d{3}\)?)[^a-zA-Z0-9]'
+    | parse --regex '^(?<name>.+)[^a-zA-Z0-9](?<year>[12]\d{3}\)?)[^a-zA-Z0-9]'
     | get -o 0.name
+    | default ''
+}
+
+# Actually the exact same regex as the name
+def parse-year []: string -> string {
+  path basename
+    | parse --regex '^(?<name>.+)[^a-zA-Z0-9](?<year>[12]\d{3}\)?)[^a-zA-Z0-9]'
+    | get -o 0.year
     | default ''
 }
 
@@ -120,7 +136,7 @@ def parse-rip []: string -> string {
     | get -o 0.rip
     | default ''
     | str replace --regex '(?i)blu-?ray' 'BluRay'
-    | str replace --regex '(?i)web-?dl' 'WEB-DL'
+    | str replace --regex '(?i)web-?dl' 'WEBDL'
 }
 
 def parse-hdr []: string -> string {

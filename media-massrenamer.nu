@@ -52,7 +52,7 @@ def "main single" [file: string, --target-base-dir: string] {
   ['Continue'] | input list $"Copied: ($cmd_cleanup)"
 }
 
-def "main season" [target_dir: string] {
+def "main season" [target_dir: string, --keep-filter: string = '.*', --offset-ep: int = 0] {
   if not ($target_dir | path exists) {
     print "This target doesn't exist"
     exit 1
@@ -69,7 +69,12 @@ def "main season" [target_dir: string] {
   let year = $target_dir | path dirname | parse-year
   let year = (input --default $year "Year: ")
 
-  let items = ls $target_dir | get name | each {parse-season-item $in --prefix $media}
+  let items = ls $target_dir
+    | where type == file
+    | where name =~ $keep_filter
+    | get name
+    | each {parse-season-item $in --prefix $media --offset-ep=$offset_ep}
+    | sort-by ep
 
   let data = {
     media: $media
@@ -80,7 +85,17 @@ def "main season" [target_dir: string] {
 
   print ($data | update items {update filename {path basename}} | table --expand)
 
-  print ($items | each {$"mv \"($in.filename | str replace '"' '\"')\" '($target_dir)/($in.target_file_name)'"} | str join "\n")
+  let items = $items | update target_file_name {$"($target_dir)/($in)"}
+
+  if ($items | group-by target_file_name | values | each {length} | any {$in > 1}) {
+    print "ERROR: There are duplicated target filenames"
+    exit 1
+  }
+
+  print ($items
+    | where {$in.filename != $in.target_file_name}
+    | each {$"mv \"($in.filename | str replace '"' '\"')\" '($in.target_file_name)'"} | str join "\n"
+  )
 }
 
 def main [] {
@@ -143,8 +158,10 @@ def parse-all [file: string, --interactive] {
   { ...$data, target_dir_name: $target_dir_name, target_file_name: $target_file_name  }
 }
 
-def parse-season-item [file: string --prefix: string] {
-  let data = {
+def parse-season-item [file: string --prefix: string, --offset-ep: int] {
+  print $"INFO: Parsing ($file | path basename)"
+
+  mut data = {
     filename: $file,
     ep: ($file | parse-ep),
     resolution: ($file | parse-resolution),
@@ -154,7 +171,30 @@ def parse-season-item [file: string --prefix: string] {
     ext: ($file | parse-ext)
   }
 
-  mut target_file_name = $prefix + '.' + $data.ep + '-'
+  if $offset_ep != 0 {
+    $data.ep_corrected = ($file | parse-ep --offset-ep=$offset_ep)
+  }
+
+  if $data.ext == 'srt' {
+    # Try find lang
+    $data.srt_lang = ($file | parse-srt-lang)
+
+    # Find corresponding season item file
+    let candidates = ls ($file | path dirname)
+      | select name
+      | insert ep {$in.name | parse-ep}
+      | insert ext {$in.name | parse-ext}
+      | where ep == $data.ep
+      | where ext in [mkv, mp4]
+
+    if ($candidates | length) == 1 {
+      # Found, use the data from the video item so its renamed correctly
+      let data_ref = parse-season-item $candidates.0.name --prefix=$prefix --offset-ep=$offset_ep
+      $data = $data | merge ($data_ref | select ep resolution rip hdr codec) | insert piggyback true
+    }
+  }
+
+  mut target_file_name = $prefix + '.' + ($data | get -o ep_corrected | default $data.ep) + '-'
 
   $target_file_name += $data.resolution + '.'
   if ($data.rip | is-not-empty) {
@@ -164,6 +204,9 @@ def parse-season-item [file: string --prefix: string] {
     $target_file_name += $data.hdr + '.'
   }
   $target_file_name += $data.codec + '.'
+  if ($data | get -o srt_lang | is-not-empty) {
+    $target_file_name += $data.srt_lang + '.'
+  }
   $target_file_name += $data.ext
 
   { ...$data, target_file_name: $target_file_name }
@@ -185,11 +228,25 @@ def parse-year []: string -> string {
 }
 
 def parse-resolution []: string -> string {
-  path basename
+  let file = $in
+  $file
+    | path basename
     | parse --regex '[^a-zA-Z0-9](?<resolution>(?:720|1080|2160)p|UHD)[^a-zA-Z0-9]'
     | get -o 0.resolution
-    | default ''
+    | default {
+      print "WARN: Could not find resolution in name, using ffprobe"
+      ^ffprobe -v quiet -output_format json -show_streams -i $file
+        | from json
+        | get streams
+        | where codec_type == video
+        | get -o 0.height
+        | $"($in)"
+    }
+    | str replace --regex '^(\d+)$' '${1}p'
     | str replace 'UHD' '2160p'
+    | str replace '544p' '720p'
+    | str replace '814p' '1080p'
+    | str replace '816p' '1080p'
 }
 
 def parse-rip []: string -> string {
@@ -211,9 +268,19 @@ def parse-hdr []: string -> string {
 }
 
 def parse-codec []: string -> string {
-  path basename
+  let file = $in
+  $file
+    | path basename
     | parse --regex '(?i)[^a-zA-Z0-9](?<codec>[hx]\.?26[456]|av1|avc|hevc)[^a-zA-Z0-9]'
     | get -o 0.codec
+    | default {
+      print "WARN: Could not find codec in name, using ffprobe"
+      ^ffprobe -v quiet -output_format json -show_streams -i $file
+        | from json
+        | get streams
+        | where codec_type == video
+        | get -o 0.codec_name
+    }
     | default ''
     | str upcase
     | str replace --regex '[HX]\.?264' 'AVC'
@@ -226,11 +293,33 @@ def parse-ext []: string -> string {
     | str downcase
 }
 
-def parse-ep []: string -> string {
-  parse --regex '[^a-zA-Z0-9](?<ep>[sS]\d{1,2}[^0-9]?[eE]\d{1,2})[^a-zA-Z0-9]'
-    | get 0.ep
-    | str upcase
-    | str replace --regex '[^0-9SE]' ''
+def parse-ep [--offset-ep: int = 0]: string -> string {
+  let file = $in
+  $file
+    | path basename
+    | parse --regex '(?:[^a-zA-Z0-9][sS]|[^0-9])(?<s>\d{1,2})[^0-9]?[eEx](?<e>\d{1,2})[^a-zA-Z0-9]'
+    | get -o 0
+    | default {
+      print "WARN: Using degraded ep parser"
+
+      let fallback_e = $file
+        | path basename
+        | parse --regex '[^a-zA-Z][eE](?<e>\d{1,2})[^0-9]'
+        | get -o 0.e
+        | default {$file | path basename | parse --regex '(?:[^0-9](?<e>\d{2})[^0-9])' | get 0.e}
+
+      let s = $file | path dirname | path basename | parse 'Season.{s}' | get 0.s
+      { s: $s, e: $fallback_e }
+    }
+    | update e {($in | into int) + $offset_ep}
+    | $"S($in.s | fill -a r -w 2 -c 0)E($in.e | fill -a r -w 2 -c 0)"
+}
+
+def parse-srt-lang []: string -> string {
+  path basename
+    | parse --regex '\.(?<lang>[a-z]{2,3})\.srt$'
+    | get -o 0.lang
+    | default ''
 }
 
 # vim: set tabstop=2 shiftwidth=2 expandtab :

@@ -23,7 +23,7 @@ authentication_backend:
     user: uid=authelia,ou=people,dc=homelab,dc=icanwalkonwater,dc=dev
 
   password_reset:
-    disable: true
+    disable: false
 
 session:
   name: authelia_session
@@ -41,6 +41,10 @@ storage:
 notifier:
   filesystem:
     filename: /config/notification.txt
+
+identity_validation:
+  reset_password:
+    jwt_lifespan: 48 hours
 
 access_control:
   default_policy: one_factor

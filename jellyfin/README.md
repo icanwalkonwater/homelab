@@ -7,6 +7,7 @@ This assumes that there is a LDAP user named `jellyfin` with read access as well
 - [ ] General / Server name: Lucasfilm
 - [ ] Plugins / LDAP Authentication: Install
 - [ ] Plugins / Kodi Sync Queue: Install
+- [ ] Plugins / Open Subtitbes: Install
 - [ ] Wait for scan to end
 - [ ] Restart
 - [ ] My Plgins / LDAP Auth
@@ -19,7 +20,7 @@ This assumes that there is a LDAP user named `jellyfin` with read access as well
   - [ ] LDAP Search Filter: `(memberof=cn=jellyfin.viewer,ou=groups,dc=homelab,dc=icanwalkonwater,dc=dev)`
   - [ ] LDAP Search Attributes: `uid, mail`
   - [ ] LDAP Uid Attribute: `uid`
-  - [ ] LDAP Username Attribute: `uid`
+  - [ ] LDAP Username Attribute: `displayname`
   - [ ] LDAP Admin Base DN: leave empty
   - [ ] LDAP Admin Filter: `(memberof=cn=jellyfin.admin,ou=groups,dc=homelab,dc=icanwalkonwater,dc=dev)`
   - [ ] Enable User Creation: check

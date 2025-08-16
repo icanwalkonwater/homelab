@@ -3,6 +3,9 @@ apiVersion: helm.cattle.io/v1
 kind: HelmChart
 metadata:
   name: cert-manager
+  labels:
+    app.kubernetes.io/name: cert-manager
+    app.kubernetes.io/component: chart
 spec:
   repo: https://charts.jetstack.io
   chart: cert-manager

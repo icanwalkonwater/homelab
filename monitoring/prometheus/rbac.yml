@@ -1,4 +1,5 @@
 # Taken from the Prometheus Operator docs
+# This is to be able to scrape the kubelet metrics
 ---
 apiVersion: v1
 kind: ServiceAccount

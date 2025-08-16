@@ -25,13 +25,16 @@ scrape_configs:
         target_label: __address__
 
       # Select some interesting labels to keep
-      - source_labels: [__meta_kubernetes_endpoints_label_app_kubernetes_io_name]
+      - source_labels: [__meta_kubernetes_namespace]
         action: replace
-        target_label: kubernetes_scraped_app
-      - source_labels: [__meta_kubernetes_endpoint_node_name]
+        target_label: kubernetes_namespace
+      - source_labels: [__meta_kubernetes_service_label_app_kubernetes_io_name]
+        action: replace
+        target_label: kubernetes_app
+      - source_labels: [__meta_kubernetes_service_node_name]
         action: replace
         target_label: kubernetes_node
-      - source_labels: [__meta_kubernetes_pod_name]
+      - source_labels: [__meta_kubernetes_service_name]
         action: replace
         target_label: kubernetes_pod
 
@@ -57,10 +60,13 @@ scrape_configs:
         target_label: __address__
 
       # Select some interesting labels to keep
-      - source_labels: [__meta_kubernetes_endpoints_label_app_kubernetes_io_name]
+      - source_labels: [__meta_kubernetes_namespace]
         action: replace
-        target_label: kubernetes_scraped_app
-      - source_labels: [__meta_kubernetes_endpoint_node_name]
+        target_label: kubernetes_namespace
+      - source_labels: [__meta_kubernetes_pod_label_app_kubernetes_io_name]
+        action: replace
+        target_label: kubernetes_app
+      - source_labels: [__meta_kubernetes_pod_node_name]
         action: replace
         target_label: kubernetes_node
       - source_labels: [__meta_kubernetes_pod_name]

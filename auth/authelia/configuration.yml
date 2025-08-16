@@ -2,6 +2,10 @@
 ---
 theme: dark
 
+telemetry:
+  metrics:
+    enabled: true
+
 authentication_backend:
   ldap:
     implementation: custom

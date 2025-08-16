@@ -2,6 +2,15 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
+labels:
+  - pairs:
+      app.kubernetes.io/name: authelia
+    includeTemplates: true
+    includeSelectors: true
+  - pairs:
+      app.kubernetes.io/component: oauth
+    includeTemplates: true
+
 namespace: auth
 resources:
   - deployment.yml

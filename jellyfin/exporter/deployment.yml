@@ -1,0 +1,45 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: exporter
+spec:
+  replicas: 1
+  revisionHistoryLimit: 2
+
+  template:
+    spec:
+      containers:
+        - name: json-exporter
+          image: json-exporter
+          args:
+            - --config.file=/config.yml
+          ports:
+            - { name: http, containerPort: 7979 }
+          volumeMounts:
+            - name: config
+              mountPath: /config.yml
+              subPath: config.yml
+              readOnly: true
+            - name: credentials
+              mountPath: /var/run/secrets/icanwalkonwater.dev/api-token.yml
+              subPath: api-token.txt
+              readOnly: true
+          resources:
+            requests: { cpu: 10m, memory: 64Mi }
+            limits: { cpu: 100m, memory: 64Mi }
+
+      volumes:
+        - name: config
+          configMap:
+            name: exporter-config
+            items: [{ key: config.yml, path: config.yml }]
+        - name: credentials
+          secret:
+            secretName: exporter-credentials
+            items: [{ key: JELLYFIN_API_TOKEN, path: api-token.txt }]
+
+      # securityContext:
+      #   runAsUser: 1001
+      #   runAsGroup: 1001
+      #   runAsNonRoot: true

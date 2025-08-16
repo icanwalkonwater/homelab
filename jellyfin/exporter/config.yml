@@ -1,0 +1,29 @@
+# Inspired by: https://sno.ws/jellyfin-stats
+---
+modules:
+  jellyfin:
+    headers:
+      Accept: application/json
+    http_client_config:
+      authorization:
+        type: MediaBrowser
+        credentials_file: /var/run/secrets/icanwalkonwater.dev/api-token.yml
+
+    metrics:
+      - name: jellyfin
+        type: object
+        help: User playback metrics from Jellyfin
+        path: '{ [?(@.NowPlayingItem)] }'
+        labels:
+          user_name: '{ .UserName }'
+          item_type: '{ .NowPlayingItem.Type }'
+          item_name: '{ .NowPlayingItem.Name }'
+          item_path: '{ .NowPlayingItem.Path }'
+          series_name: '{ .NowPlayingItem.SeriesName }'
+          episode_index: '{ .NowPlayingItem.IndexNumber }'
+          season_index: '{ .NowPlayingItem.ParentIndexNumber }'
+          client_name: '{ .Client }'
+          device_name: '{ .DeviceName }'
+          session_id: '{ .Id }'
+        values:
+          is_paused: '{ .PlayState.IsPaused }'

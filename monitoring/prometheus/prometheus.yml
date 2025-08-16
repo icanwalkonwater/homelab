@@ -101,3 +101,18 @@ scrape_configs:
     relabel_configs:
       - action: labelmap
         regex: __meta_kubernetes_node_label_(.+)
+
+  # Scrape Jellyfin
+  - job_name: jellyfin/0
+    metrics_path: /probe
+    params:
+      module: [jellyfin]
+    static_configs:
+      - targets: [http://jellyfin.jellyfin.svc.cluster.local:8096/Sessions]
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: exporter.jellyfin.svc.cluster.local:7979

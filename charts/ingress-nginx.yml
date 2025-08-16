@@ -14,6 +14,11 @@ spec:
   createNamespace: true
   valuesContent: |-
     controller:
+      metrics:
+        enabled: true
+        service:
+          annotations:
+            prometheus.io/scrape: 'true'
       extraArgs:
         enable-ssl-passthrough: 'true'
         default-ssl-certificate: 'cert-manager/mon-enorme-uk-tls'

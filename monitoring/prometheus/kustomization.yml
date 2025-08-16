@@ -3,7 +3,9 @@ kind: Kustomization
 
 labels:
   - pairs:
-      app.kubernetes.io/part-of: prometheus
+      app.kubernetes.io/name: prometheus
+  - pairs:
+      app.kubernetes.io/component: scraper
     includeTemplates: true
 
 resources:

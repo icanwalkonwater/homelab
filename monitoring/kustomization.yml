@@ -4,6 +4,7 @@ kind: Kustomization
 # decorative labels, they don't do anything
 labels:
   - pairs:
+      app.kubernetes.io/part-of: monitoring
       app.kubernetes.io/managed-by: kustomize
     includeTemplates: true
 

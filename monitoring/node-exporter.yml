@@ -5,7 +5,6 @@ metadata:
   name: node-exporter
   labels:
     app.kubernetes.io/name: node-exporter
-    app.kubernetes.io/part-of: prometheus
   annotations:
     prometheus.io/scrape: 'true'
 spec:
@@ -23,7 +22,6 @@ metadata:
   name: node-exporter
   labels:
     app.kubernetes.io/name: node-exporter
-    app.kubernetes.io/part-of: prometheus
 spec:
   selector:
     matchLabels:

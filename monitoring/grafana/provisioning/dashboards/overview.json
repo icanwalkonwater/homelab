@@ -95,7 +95,7 @@
           "expr": "node_time_seconds - node_boot_time_seconds",
           "format": "time_series",
           "instant": true,
-          "legendFormat": "{{kubernetes_node}}",
+          "legendFormat": "{{node}}",
           "range": false,
           "refId": "A"
         }
@@ -151,6 +151,7 @@
       "id": 15,
       "options": {
         "displayLabels": [
+          "value",
           "percent"
         ],
         "legend": {
@@ -160,8 +161,7 @@
           "sortBy": "Percent",
           "sortDesc": true,
           "values": [
-            "value",
-            "percent"
+            "value"
           ]
         },
         "pieType": "pie",
@@ -1199,5 +1199,5 @@
   "timezone": "browser",
   "title": "Cluster Overview",
   "uid": "ddkidii0j6kg0b",
-  "version": 4
+  "version": 5
 }

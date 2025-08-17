@@ -187,7 +187,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "sum by(node, device) (node_filesystem_size_bytes{fstype=\"btrfs\"} - node_filesystem_avail_bytes{fstype=\"btrfs\"})",
+          "expr": "max by(node, device) (node_filesystem_size_bytes{fstype=\"btrfs\"} - node_filesystem_avail_bytes{fstype=\"btrfs\"})",
           "instant": true,
           "legendFormat": "{{node}} ({{device}}) - Used",
           "range": false,
@@ -200,7 +200,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "sum by(node, device) (node_filesystem_avail_bytes{fstype=\"btrfs\"})",
+          "expr": "max by(node, device) (node_filesystem_avail_bytes{fstype=\"btrfs\"})",
           "format": "time_series",
           "hide": false,
           "instant": true,
@@ -405,7 +405,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "sum(rate(container_network_receive_bytes_total{namespace='$ingressNamespace'}[$__rate_interval]))",
+          "expr": "sum(rate(nginx_ingress_controller_request_size_sum[$__rate_interval]))",
           "instant": false,
           "legendFormat": "Ingress",
           "range": true,
@@ -417,7 +417,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "sum(rate(container_network_transmit_bytes_total{namespace='$ingressNamespace'}[$__rate_interval]))",
+          "expr": "sum(rate(nginx_ingress_controller_response_size_sum[$__rate_interval]))",
           "hide": false,
           "instant": false,
           "legendFormat": "Egress",
@@ -430,7 +430,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "(sum(rate(container_network_receive_bytes_total[$__rate_interval]))\n  + sum(rate(container_network_transmit_bytes_total[$__rate_interval]))\n  - sum(rate(container_network_receive_bytes_total{namespace=\"ingress-nginx\"}[$__rate_interval]))\n  - sum(rate(container_network_transmit_bytes_total{namespace=\"ingress-nginx\"}[$__rate_interval]))) / 2.0",
+          "expr": "sum(rate(container_network_transmit_bytes_total[$__rate_interval]))",
           "hide": false,
           "instant": false,
           "legendFormat": "Internal",
@@ -569,7 +569,7 @@
               }
             ]
           },
-          "unit": "reqps"
+          "unit": "reqpm"
         },
         "overrides": []
       },
@@ -605,7 +605,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "sum(rate(apiserver_request_total[$__rate_interval]))",
+          "expr": "sum(rate(apiserver_request_total[60s])) * 60s",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
@@ -673,7 +673,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "code",
-          "expr": "sum(rate(nginx_ingress_controller_requests{status=~\"[123][0-9][0-9]\"}[60s])) * 60s",
+          "expr": "sum(rate(nginx_ingress_controller_requests{status=~\"[123][0-9][0-9]\"}[60m])) * 60s",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -688,7 +688,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "sum(rate(nginx_ingress_controller_requests{status=~\"[45][0-9][0-9]\"}[60s])) * 60s",
+          "expr": "sum(rate(nginx_ingress_controller_requests{status=~\"[45][0-9][0-9]\"}[60m])) * 60s",
           "hide": false,
           "instant": false,
           "legendFormat": "Error",
@@ -696,7 +696,7 @@
           "refId": "B"
         }
       ],
-      "title": "HTTP Traffic",
+      "title": "HTTP Traffic (1h)",
       "type": "stat"
     },
     {
@@ -784,11 +784,12 @@
       "options": {
         "legend": {
           "calcs": [
-            "last"
+            "last",
+            "max"
           ],
           "displayMode": "table",
           "placement": "bottom",
-          "showLegend": true
+          "showLegend": false
         },
         "tooltip": {
           "hideZeros": false,
@@ -1049,11 +1050,14 @@
       "options": {
         "legend": {
           "calcs": [
-            "last"
+            "last",
+            "max"
           ],
           "displayMode": "table",
           "placement": "bottom",
-          "showLegend": true
+          "showLegend": true,
+          "sortBy": "Last",
+          "sortDesc": true
         },
         "tooltip": {
           "hideZeros": false,
@@ -1148,11 +1152,13 @@
         "legend": {
           "calcs": [
             "last",
-            "diff"
+            "max"
           ],
           "displayMode": "table",
           "placement": "bottom",
-          "showLegend": true
+          "showLegend": true,
+          "sortBy": "Last",
+          "sortDesc": true
         },
         "tooltip": {
           "hideZeros": false,
@@ -1217,5 +1223,5 @@
   "timezone": "browser",
   "title": "Cluster Overview",
   "uid": "ddkidii0j6kg0b",
-  "version": 6
+  "version": 7
 }

@@ -1,0 +1,26 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+labels:
+  - pairs:
+      app.kubernetes.io/name: paperless
+    includeTemplates: true
+    includeSelectors: true
+  - pairs:
+      app.kubernetes.io/component: paperless
+    includeTemplates: true
+
+namespace: paperless
+resources:
+  - deployment.yml
+  - service.yml
+  - ingress.yml
+  - pv.yml
+
+secretGenerator:
+  - name: paperless-credentials
+    options:
+      disableNameSuffixHash: true
+    envs:
+      - paperless-credentials.env

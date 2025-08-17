@@ -1,0 +1,17 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+labels:
+  - pairs:
+      app.kubernetes.io/name: redis
+    includeTemplates: true
+    includeSelectors: true
+  - pairs:
+      app.kubernetes.io/component: broker
+    includeTemplates: true
+
+namespace: paperless
+resources:
+  - deployment.yml
+  - service.yml

@@ -1,0 +1,100 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: paperless-data-pv
+spec:
+  local:
+    path: /var/lib/rancher/k3s/storage/paperless-data
+  capacity: { storage: 5G }
+  accessModes: [ReadWriteOncePod]
+  storageClassName: ''
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions: [{ key: kubernetes.io/hostname, operator: In, values: [coruscant] }]
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: paperless-data-pvc
+spec:
+  volumeName: paperless-data-pv
+  storageClassName: ''
+  accessModes: [ReadWriteOncePod]
+  resources: { requests: { storage: 5G } }
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: paperless-media-pv
+spec:
+  local:
+    path: /mnt/lucastrunk/@documents
+  capacity: { storage: 50G }
+  accessModes: [ReadWriteOncePod]
+  storageClassName: ''
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions: [{ key: kubernetes.io/hostname, operator: In, values: [coruscant] }]
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: paperless-media-pvc
+spec:
+  volumeName: paperless-media-pv
+  storageClassName: ''
+  accessModes: [ReadWriteOncePod]
+  resources: { requests: { storage: 50G } }
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: paperless-trash-pv
+spec:
+  local:
+    path: /mnt/lucastrunk/@k3s/@storage/paperless-trash
+  capacity: { storage: 10G }
+  accessModes: [ReadWriteOncePod]
+  storageClassName: ''
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions: [{ key: kubernetes.io/hostname, operator: In, values: [coruscant] }]
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: paperless-trash-pvc
+spec:
+  volumeName: paperless-trash-pv
+  storageClassName: ''
+  accessModes: [ReadWriteOncePod]
+  resources: { requests: { storage: 10G } }
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: paperless-ingest-pv
+spec:
+  local:
+    path: /mnt/lucastrunk/@k3s/@storage/paperless-ingest
+  capacity: { storage: 10G }
+  accessModes: [ReadWriteOncePod]
+  storageClassName: ''
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions: [{ key: kubernetes.io/hostname, operator: In, values: [coruscant] }]
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: paperless-ingest-pvc
+spec:
+  volumeName: paperless-ingest-pv
+  storageClassName: ''
+  accessModes: [ReadWriteOncePod]
+  resources: { requests: { storage: 10G } }

@@ -45,7 +45,7 @@ spec:
             - name: trash
               mountPath: /trash
             - name: ingest
-              mountPath: /consume
+              mountPath: /ingest
             - name: credentials
               mountPath: /var/run/secrets/icanwalkonwater.dev
               readOnly: true

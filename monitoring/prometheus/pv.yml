@@ -6,7 +6,7 @@ metadata:
 spec:
   local:
     path: /mnt/lucastrunk/@k3s/@storage/prometheus-data
-  capacity: { storage: 100G }
+  capacity: { storage: 55G }
   accessModes: [ReadWriteOncePod]
   storageClassName: ''
   nodeAffinity:

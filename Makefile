@@ -13,9 +13,11 @@ up:
 	kubectl apply -k monitoring
 	kubectl apply -k mealie
 	kubectl apply -k jellyfin
+	kubectl apply -k paperless
 
 .PHONY: down
 down:
+	kubectl delete -k paperless
 	kubectl delete -k jellyfin
 	kubectl delete -k mealie
 	kubectl delete -k monitoring

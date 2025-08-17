@@ -8,6 +8,7 @@ help:
 up:
 	kubectl apply -k charts
 	kubectl apply -k cert-manager-issuers
+	kubectl apply -k redirects
 	kubectl apply -k auth
 	kubectl apply -k monitoring
 	kubectl apply -k mealie
@@ -19,5 +20,6 @@ down:
 	kubectl delete -k mealie
 	kubectl delete -k monitoring
 	kubectl delete -k auth
+	kubectl delete -k redirects
 	kubectl delete -k cert-manager-issuers
 	kubectl delete -k charts

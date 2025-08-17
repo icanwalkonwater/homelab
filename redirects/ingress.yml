@@ -1,0 +1,15 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: enorme-uk-to-github
+  annotations:
+    nginx.ingress.kubernetes.io/permanent-redirect: 'https://github.com/icanwalkonwater'
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: enorme.uk
+  tls:
+  - hosts:
+    - 'enorme.uk'
+    secretName: root-enorme-uk-tls

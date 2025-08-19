@@ -30,7 +30,7 @@ metadata:
   name: paperless-media-pv
 spec:
   local:
-    path: /mnt/lucastrunk/@documents
+    path: /mnt/lucastrunk/@k3s/@storage/paperless-media
   capacity: { storage: 50G }
   accessModes: [ReadWriteOncePod]
   storageClassName: ''
@@ -95,6 +95,31 @@ metadata:
   name: paperless-ingest-pvc
 spec:
   volumeName: paperless-ingest-pv
+  storageClassName: ''
+  accessModes: [ReadWriteOncePod]
+  resources: { requests: { storage: 10G } }
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: paperless-export-pv
+spec:
+  local:
+    path: /mnt/lucastrunk/@documents/paperless-export
+  capacity: { storage: 10G }
+  accessModes: [ReadWriteOncePod]
+  storageClassName: ''
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions: [{ key: kubernetes.io/hostname, operator: In, values: [coruscant] }]
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: paperless-export-pvc
+spec:
+  volumeName: paperless-export-pv
   storageClassName: ''
   accessModes: [ReadWriteOncePod]
   resources: { requests: { storage: 10G } }

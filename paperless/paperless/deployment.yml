@@ -46,6 +46,8 @@ spec:
               mountPath: /trash
             - name: ingest
               mountPath: /ingest
+            - name: export
+              mountPath: /export
             - name: credentials
               mountPath: /var/run/secrets/icanwalkonwater.dev
               readOnly: true
@@ -68,6 +70,8 @@ spec:
           persistentVolumeClaim: { claimName: paperless-trash-pvc }
         - name: ingest
           persistentVolumeClaim: { claimName: paperless-ingest-pvc }
+        - name: export
+          persistentVolumeClaim: { claimName: paperless-export-pvc }
         - name: credentials
           secret:
             secretName: paperless-credentials

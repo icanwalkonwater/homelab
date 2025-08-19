@@ -51,7 +51,10 @@ identity_validation:
     jwt_lifespan: 48 hours
 
 access_control:
-  default_policy: two_factor
+  default_policy: deny
+  rules:
+    - domain: identifie.mon.enorme.uk
+      policy: one_factor
 
 identity_providers:
   oidc:

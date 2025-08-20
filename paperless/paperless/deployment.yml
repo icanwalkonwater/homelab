@@ -37,6 +37,10 @@ spec:
             - { name: PAPERLESS_SOCIALACCOUNT_PROVIDERS_FILE, value: /var/run/secrets/icanwalkonwater.dev/allauth-providers.txt }
             - { name: PAPERLESS_SOCIAL_AUTO_SIGNUP, value: 'true' }
             - { name: PAPERLESS_SOCIAL_ACCOUNT_SYNC_GROUPS, value: 'true' }
+
+            - { name: PAPERLESS_OCR_LANGUAGE, value: fra+eng }
+            # NOTE: Fixes crashes on seemingly very big PDFs ?
+            - { name: PAPERLESS_OCR_USER_ARGS, value: '{"continue_on_soft_render_error": true}' }
           ports:
             - { name: http, containerPort: 8000 }
           volumeMounts:

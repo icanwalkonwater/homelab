@@ -18,6 +18,8 @@ spec:
             - { name: USERMAP_UID, value: '1002' }
             - { name: USERMAP_GID, value: '1002' }
             - { name: PAPERLESS_URL, value: 'https://essuie.mon.enorme.uk' }
+            - { name: PAPERLESS_TASK_WORKERS, value: '1' }
+            - { name: PAPERLESS_THREADS_PER_WORKER, value: '2' }
 
             - { name: PAPERLESS_PORT, value: '8000' }
             - { name: PAPERLESS_REDIS, value: redis://redis.paperless.svc:6379 }

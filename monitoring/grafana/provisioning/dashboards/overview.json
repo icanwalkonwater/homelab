@@ -1073,7 +1073,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "(sum(rate(container_cpu_usage_seconds_total{container!=\"\"}[$__rate_interval])) by (namespace,pod)) * 1000",
+          "expr": "(sum(rate(container_cpu_usage_seconds_total{container!=\"\",namespace=~\"$usageNamespace\"}[$__rate_interval])) by (namespace,pod)) * 1000",
           "instant": false,
           "legendFormat": "{{namespace}}/{{pod}}",
           "range": true,
@@ -1174,7 +1174,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "sum(container_memory_rss{container!=\"\"}) by (namespace, pod)",
+          "expr": "sum(container_memory_rss{container!=\"\",namespace=~\"$usageNamespace\"}) by (namespace, pod)",
           "instant": false,
           "legendFormat": "{{namespace}}/{{pod}}",
           "range": true,
@@ -1190,7 +1190,38 @@
   "schemaVersion": 41,
   "tags": [],
   "templating": {
-    "list": []
+    "list": [
+      {
+        "allValue": ".*",
+        "current": {
+          "text": [
+            "All"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
+        "definition": "label_values(container_last_seen,namespace)",
+        "includeAll": true,
+        "label": "Usage Namespace",
+        "multi": true,
+        "name": "usageNamespace",
+        "options": [],
+        "query": {
+          "qryType": 1,
+          "query": "label_values(container_last_seen,namespace)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      }
+    ]
   },
   "time": {
     "from": "now-1h",
@@ -1200,5 +1231,5 @@
   "timezone": "browser",
   "title": "Cluster Overview",
   "uid": "ddkidii0j6kg0b",
-  "version": 11
+  "version": 12
 }

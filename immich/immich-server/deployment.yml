@@ -31,6 +31,10 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /data
+            - name: config
+              mountPath: /immich.json
+              subPath: immich.json
+              readOnly: true
             - name: credentials
               mountPath: /var/run/secrets/icanwalkonwater.dev
               readOnly: true
@@ -48,6 +52,10 @@ spec:
       volumes:
         - name: data
           persistentVolumeClaim: { claimName: immich-data-pvc }
+        - name: config
+          configMap:
+            name: immich-server-config
+            items: [{ key: immich.json, path: immich.json }]
         - name: credentials
           secret:
             secretName: immich-server-credentials

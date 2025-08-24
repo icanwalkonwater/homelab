@@ -14,7 +14,11 @@ def "main mass" [...files: string] {
   print ($out | update filename {path basename})
 }
 
-def "main single" [file: string, --target-base-dir: string] {
+def "main single" [
+  file: string, # Target file to rename.
+  --target-base-dir (-t): string, # Directory to put the renamed file in.
+  --mv, # Enable to use `mv` instead of `ln`.
+] {
   if not ($file | path exists) {
     print "This file doesn't exists"
     exit 1
@@ -38,21 +42,28 @@ def "main single" [file: string, --target-base-dir: string] {
 
   let target_dir = $"($target_base_dir)/($data.target_dir_name)"
 
-  let cmd_mkdir = $"mkdir -p '($target_dir)'"
-  let cmd_ln = $"ln '($file)' '($target_dir)/($data.target_file_name)'"
-  let cmd_cleanup = $"rm '($file)'"
-
-  ^wl-copy $cmd_mkdir
-  ['Continue'] | input list $"Copied: ($cmd_mkdir)"
-
-  ^wl-copy $cmd_ln
-  ['Continue'] | input list $"Copied: ($cmd_ln)"
-
-  ^wl-copy $cmd_cleanup
-  ['Continue'] | input list $"Copied: ($cmd_cleanup)"
+  print $"mkdir -p '($target_dir)'"
+  print $"(if $mv { 'mv' } else { 'ln' }) '($file)' '($target_dir)/($data.target_file_name)'"
 }
 
-def "main season" [target_dir: string, --keep-filter: string = '.*', --offset-ep: int = 0] {
+def "main season" [
+  source_dir: string, # Directory to get the episodes from.
+  --target-dir: string, # Alternative directory to put the episodes in, defaults to `source_dir`.
+  --keep-filter (-f): string = '.*', # Regex that needs to match for the episode to be considered.
+  --offset-ep: int = 0, # Will add this offset to the episode number.
+  --mv, # Enable to use `mv` instead of `ln`.
+] {
+  if not ($source_dir | path exists) {
+    print "This source doesn't exist"
+    exit 1
+  }
+  if ($source_dir | path type) != 'dir' {
+    print "Source isn't a directory"
+    exit 1
+  }
+
+  let target_dir = $target_dir | default $source_dir
+
   if not ($target_dir | path exists) {
     print "This target doesn't exist"
     exit 1
@@ -62,18 +73,21 @@ def "main season" [target_dir: string, --keep-filter: string = '.*', --offset-ep
     exit 1
   }
 
+  let source_dir = $source_dir | path expand
   let target_dir = $target_dir | path expand
 
   let media = $target_dir | path dirname | parse-medianame
   let media = (input --default $media "Media: ")
   let year = $target_dir | path dirname | parse-year
   let year = (input --default $year "Year: ")
+  let season = $target_dir | path basename | parse 'Season.{s}' | get -o 0.s | default '1' | into int | into string
+  let season = (input --default=$season "Season: ") | into int
 
-  let items = ls $target_dir
+  let items = ls $source_dir
     | where type == file
     | where name =~ $keep_filter
     | get name
-    | each {parse-season-item $in --prefix $media --offset-ep=$offset_ep}
+    | each {parse-season-item $in --season=$season --prefix=$media --offset-ep=$offset_ep}
     | sort-by ep
 
   let data = {
@@ -94,7 +108,7 @@ def "main season" [target_dir: string, --keep-filter: string = '.*', --offset-ep
 
   print ($items
     | where {$in.filename != $in.target_file_name}
-    | each {$"mv \"($in.filename | str replace '"' '\"')\" '($in.target_file_name)'"} | str join "\n"
+    | each {$"(if $mv { 'mv' } else { 'ln' }) \"($in.filename | str replace '"' '\"')\" '($in.target_file_name)'"} | str join "\n"
   )
 }
 
@@ -158,12 +172,12 @@ def parse-all [file: string, --interactive] {
   { ...$data, target_dir_name: $target_dir_name, target_file_name: $target_file_name  }
 }
 
-def parse-season-item [file: string --prefix: string, --offset-ep: int] {
+def parse-season-item [file: string, --season: int, --prefix: string, --offset-ep: int] {
   print $"INFO: Parsing ($file | path basename)"
 
   mut data = {
     filename: $file,
-    ep: ($file | parse-ep),
+    ep: ($file | parse-ep $season),
     resolution: ($file | parse-resolution),
     rip: ($file | parse-rip),
     hdr: ($file | parse-hdr),
@@ -172,7 +186,7 @@ def parse-season-item [file: string --prefix: string, --offset-ep: int] {
   }
 
   if $offset_ep != 0 {
-    $data.ep_corrected = ($file | parse-ep --offset-ep=$offset_ep)
+    $data.ep_corrected = ($file | parse-ep $season --offset-ep=$offset_ep)
   }
 
   if $data.ext == 'srt' {
@@ -182,7 +196,7 @@ def parse-season-item [file: string --prefix: string, --offset-ep: int] {
     # Find corresponding season item file
     let candidates = ls ($file | path dirname)
       | select name
-      | insert ep {$in.name | parse-ep}
+      | insert ep {$in.name | parse-ep $season}
       | insert ext {$in.name | parse-ext}
       | where ep == $data.ep
       | where ext in [mkv, mp4]
@@ -293,7 +307,7 @@ def parse-ext []: string -> string {
     | str downcase
 }
 
-def parse-ep [--offset-ep: int = 0]: string -> string {
+def parse-ep [season: int, --offset-ep: int = 0]: string -> string {
   let file = $in
   $file
     | path basename
@@ -308,8 +322,7 @@ def parse-ep [--offset-ep: int = 0]: string -> string {
         | get -o 0.e
         | default {$file | path basename | parse --regex '(?:[^0-9](?<e>\d{2})[^0-9])' | get 0.e}
 
-      let s = $file | path dirname | path basename | parse 'Season.{s}' | get 0.s
-      { s: $s, e: $fallback_e }
+      { s: $season, e: $fallback_e }
     }
     | update e {($in | into int) + $offset_ep}
     | $"S($in.s | fill -a r -w 2 -c 0)E($in.e | fill -a r -w 2 -c 0)"

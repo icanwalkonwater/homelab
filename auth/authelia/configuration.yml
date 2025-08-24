@@ -18,13 +18,13 @@ authentication_backend:
     additional_groups_dn: ou=groups
     groups_filter: (member={dn})
 
+    user: uid=authelia,ou=people,dc=homelab,dc=icanwalkonwater,dc=dev
+
     attributes:
       display_name: displayName
       username: uid
       group_name: cn
       mail: mail
-
-    user: uid=authelia,ou=people,dc=homelab,dc=icanwalkonwater,dc=dev
 
   password_reset:
     disable: false
@@ -133,4 +133,4 @@ identity_providers:
         grant_types: [authorization_code]
         id_token_signed_response_alg: RS256
         userinfo_signed_response_alg: RS256
-        token_endpoint_auth_method: client_secret_basic
+        token_endpoint_auth_method: client_secret_post

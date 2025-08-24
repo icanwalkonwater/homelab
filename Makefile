@@ -14,9 +14,11 @@ up:
 	kubectl apply -k mealie
 	kubectl apply -k jellyfin
 	kubectl apply -k paperless
+	kubectl apply -k immich
 
 .PHONY: down
 down:
+	kubectl delete -k immich
 	kubectl delete -k paperless
 	kubectl delete -k jellyfin
 	kubectl delete -k mealie

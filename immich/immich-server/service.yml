@@ -10,3 +10,31 @@ spec:
       port: 2283
       protocol: TCP
       targetPort: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: immich-api-metrics
+  annotations:
+    prometheus.io/scrape: 'true'
+spec:
+  type: ClusterIP
+  ports:
+    - name: metrics-api
+      port: 8081
+      protocol: TCP
+      targetPort: metrics-api
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: immich-msvc-metrics
+  annotations:
+    prometheus.io/scrape: 'true'
+spec:
+  type: ClusterIP
+  ports:
+    - name: metrics-msvc
+      port: 8082
+      protocol: TCP
+      targetPort: metrics-msvc

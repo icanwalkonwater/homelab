@@ -3,6 +3,8 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: immich
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: 1G
 spec:
   ingressClassName: nginx
   rules:

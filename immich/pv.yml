@@ -1,0 +1,75 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: immich-data-pv
+spec:
+  local:
+    path: /mnt/lucastrunk/@k3s/@storage/immich-data
+  capacity: { storage: 100G }
+  accessModes: [ReadWriteOncePod]
+  storageClassName: ''
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions: [{ key: kubernetes.io/hostname, operator: In, values: [coruscant] }]
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: immich-data-pvc
+spec:
+  volumeName: immich-data-pv
+  storageClassName: ''
+  accessModes: [ReadWriteOncePod]
+  resources: { requests: { storage: 100G } }
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: immich-ml-cache-pv
+spec:
+  local:
+    path: /var/lib/rancher/k3s/storage/immich-ml-cache
+  capacity: { storage: 10G }
+  accessModes: [ReadWriteOncePod]
+  storageClassName: ''
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions: [{ key: kubernetes.io/hostname, operator: In, values: [coruscant] }]
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: immich-ml-cache-pvc
+spec:
+  volumeName: immich-ml-cache-pv
+  storageClassName: ''
+  accessModes: [ReadWriteOncePod]
+  resources: { requests: { storage: 10G } }
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: immich-db-data-pv
+spec:
+  local:
+    path: /var/lib/rancher/k3s/storage/immich-db-data
+  capacity: { storage: 10G }
+  accessModes: [ReadWriteOncePod]
+  storageClassName: ''
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions: [{ key: kubernetes.io/hostname, operator: In, values: [coruscant] }]
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: immich-db-data-pvc
+spec:
+  volumeName: immich-db-data-pv
+  storageClassName: ''
+  accessModes: [ReadWriteOncePod]
+  resources: { requests: { storage: 10G } }

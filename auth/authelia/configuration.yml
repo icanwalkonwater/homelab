@@ -116,3 +116,21 @@ identity_providers:
         access_token_signed_response_alg: none
         userinfo_signed_response_alg: none
         token_endpoint_auth_method: client_secret_basic
+
+      - client_id: immich
+        client_name: Immich
+        client_secret: '$argon2id$v=19$m=65536,t=3,p=4$X1VCinBMGMfETmht7sTKnw$MZa3SP0Fqf3SvU113rYpbxbpKr/bua3YqPfAzCxGGfg'
+        public: false
+        authorization_policy: one_factor
+        consent_mode: implicit
+        require_pkce: false
+        redirect_uris:
+          - https://filme.mon.enorme.uk/auth/login
+          - https://filme.mon.enorme.uk/user-settings
+          - app.immich:///oauth-callback
+        scopes: [openid, profile, email]
+        response_types: [code]
+        grant_types: [authorization_code]
+        id_token_signed_response_alg: RS256
+        userinfo_signed_response_alg: RS256
+        token_endpoint_auth_method: client_secret_basic

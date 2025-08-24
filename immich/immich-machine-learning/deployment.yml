@@ -1,0 +1,41 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: immich-machine-learning
+spec:
+  replicas: 1
+  revisionHistoryLimit: 2
+  strategy: { type: Recreate }
+
+  template:
+    spec:
+      containers:
+        - name: immich-machine-learning
+          image: immich-machine-learning
+          env:
+            - { name: DB_USERNAME_FILE, value: /var/run/secrets/icanwalkonwater.dev/db-username }
+            - { name: DB_PASSWORD_FILE, value: /var/run/secrets/icanwalkonwater.dev/db-password }
+            - { name: DB_DATABASE_NAME, value: /var/run/secrets/icanwalkonwater.dev/db-database-name }
+          ports:
+            - { name: http, containerPort: 3003 }
+          volumeMounts:
+            - name: cache
+              mountPath: /cache
+            - name: credentials
+              mountPath: /var/run/secrets/icanwalkonwater.dev
+              readOnly: true
+          resources:
+            requests: { cpu: 100m, memory: 1Gi }
+            limits: { cpu: 2000m, memory: 2Gi }
+
+      volumes:
+        - name: cache
+          persistentVolumeClaim: { claimName: immich-ml-cache-pvc }
+        - name: credentials
+          secret:
+            secretName: immich-ml-credentials
+            items:
+              - { key: DB_USERNAME, path: db-username }
+              - { key: DB_PASSWORD, path: db-password }
+              - { key: DB_DATABASE_NAME, path: db-database-name }

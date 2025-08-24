@@ -1,0 +1,42 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+spec:
+  replicas: 1
+  revisionHistoryLimit: 2
+  strategy: { type: Recreate }
+
+  template:
+    spec:
+      containers:
+        - name: postgres
+          image: postgres
+          env:
+            - { name: DB_USERNAME_FILE, value: /var/run/secrets/icanwalkonwater.dev/db-username }
+            - { name: DB_PASSWORD_FILE, value: /var/run/secrets/icanwalkonwater.dev/db-password }
+            - { name: DB_DATABASE_NAME_FILE, value: /var/run/secrets/icanwalkonwater.dev/db-database-name }
+            - { name: POSTGRES_INITDB_ARGS, value: '--data-checksums' }
+          ports:
+            - { name: postgres, containerPort: 5432 }
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
+            - name: credentials
+              mountPath: /var/run/secrets/icanwalkonwater.dev
+              readOnly: true
+          resources:
+            requests: { cpu: 100m, memory: 500Mi }
+            limits: { cpu: 1000m, memory: 2Gi }
+
+      volumes:
+        - name: data
+          persistentVolumeClaim: { claimName: immich-db-data-pvc }
+        - name: credentials
+          secret:
+            secretName: postgres-credentials
+            items:
+              - { key: DB_USERNAME, path: db-username }
+              - { key: DB_PASSWORD, path: db-password }
+              - { key: DB_DATABASE_NAME, path: db-database-name }

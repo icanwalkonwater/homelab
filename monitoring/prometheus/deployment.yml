@@ -24,7 +24,7 @@ spec:
           image: prometheus
           args:
             - --config.file=/etc/prometheus/prometheus.yml
-            - --storage.tsdb.retention.size=50GB
+            - --storage.tsdb.retention.size=10GB
           ports:
             - { name: http, containerPort: 9090 }
           volumeMounts:

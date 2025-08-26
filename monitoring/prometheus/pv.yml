@@ -5,8 +5,8 @@ metadata:
   name: prometheus-data-pv
 spec:
   local:
-    path: /mnt/lucastrunk/@k3s/@storage/prometheus-data
-  capacity: { storage: 55G }
+    path: /var/lib/rancher/k3s/storage/prometheus-data
+  capacity: { storage: 11G }
   accessModes: [ReadWriteOncePod]
   storageClassName: ''
   nodeAffinity:
@@ -25,4 +25,4 @@ spec:
   volumeName: prometheus-data-pv
   storageClassName: ''
   accessModes: [ReadWriteOncePod]
-  resources: { requests: { storage: 100G } }
+  resources: { requests: { storage: 11G } }

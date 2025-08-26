@@ -34,9 +34,8 @@ spec:
             - name: data
               mountPath: /data
           resources:
-            limits:
-              cpu: 1000m
-              memory: 128Mi
+            requests: { cpu: 10m, memory: 16Mi }
+            limits: { cpu: 1000m, memory: 128Mi }
       volumes:
         - name: data
           persistentVolumeClaim: { claimName: lldap-data-pvc }

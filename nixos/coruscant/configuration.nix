@@ -31,45 +31,64 @@
   i18n.defaultLocale = "en_US.UTF-8";
   console.keyMap = "fr";
 
+  # Disable user modifications like passwd.
+  users.mutableUsers = false;
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.lucas = {
     isNormalUser = true;
     extraGroups = [ "wheel" ]; # Enable ‘sudo’ for the user.
-    packages = with pkgs; [
-      neovim
-      tree
-      zellij
-      tmux
-      htop
-      aria2
+    hashedPassword = null; # Explicitely disable password.
+    openssh.authorizedKeys.keys = [
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILunZriCRwN+x3Qlhb+Aj7Z2RtyBFO9Hhr2LZ0eZxodt lucas@ilum"
+    ];
+  };
+  # Lock down root
+  users.users.root = {
+    hashedPassword = "$6$rounds=1000000$7iaxvgAskJvdGQ5V$2icv5tJgTUjnJgQxL0pabzCX7hXUOdeCvLShWeoQ9zkQN1FIlQMYqUIa6a.62HCKYhQWvy5spt8MX/aj6EDwx/";
+    openssh.authorizedKeys.keys = [
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIO0/9P2EbuiAEENxpObd8dBjmZJZh7RWoxG1ZvAQP1Yq lucas@ilum"
     ];
   };
 
   environment.systemPackages = with pkgs; [
     neovim
+    tree
+    zellij
+    tmux
     wget
+    aria2
+    htop
+    powertop
   ];
 
-  services.openssh.enable = true;
+  powerManagement.powertop.enable = true;
+
+  services.openssh = {
+    enable = true;
+    settings.PermitRootLogin = "prohibit-password";
+    settings.PasswordAuthentication = false;
+  };
 
   # Open ports in the firewall.
   networking.firewall.allowedTCPPorts = [
     22 # SSH
     80 # HTTP
     443 # HTTPS
-    6443 # K3s API Server
-    # 10250
+    6443 # K3s supervisor and API Server (Agents -> Servers)
+    10250 # Kubelet metrics# K3s Flannel Wireguard IPv4
   ];
   networking.firewall.allowedUDPPorts = [
-    8472 # K3s Flannel
-    # 51820
-    # 51821
+    # 8472 # K3s Flannel VXLAN (All -> All)
+    51820 # K3s Flannel Wireguard IPv4 (All -> All)
+    # 51821 # K3s Flannel Wireguard IPv6 (All -> All)
   ];
+
+  # I don't think this is necessary
   networking.firewall.extraCommands = builtins.concatStringsSep "\n" [
     "iptables -A OUTPUT -p tcp -s 10.42.0.0/16 -j ACCEPT" # K3s pod traffic
-    "ip6tables -A OUTPUT -p tcp -s 2001:db8:42::/56 -j ACCEPT" # K3s pod traffic
+    # "ip6tables -A OUTPUT -p tcp -s 2001:db8:42::/56 -j ACCEPT" # K3s pod traffic
     "iptables -A OUTPUT -p tcp -s 10.43.0.0/16 -j ACCEPT" # K3s services traffic
-    "ip6tables -A OUTPUT -p tcp -s 2001:db8:43::/112 -j ACCEPT" # K3s services traffic
+    # "ip6tables -A OUTPUT -p tcp -s 2001:db8:43::/112 -j ACCEPT" # K3s services traffic
   ];
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
@@ -77,7 +96,7 @@
   # Copy the NixOS configuration file and link it from the resulting system
   # (/run/current-system/configuration.nix). This is useful in case you
   # accidentally delete configuration.nix.
-  # system.copySystemConfiguration = true;
+  system.copySystemConfiguration = true;
 
   # This option defines the first version of NixOS you have installed on this particular machine,
   # and is used to maintain compatibility with application data (e.g. databases) created on older NixOS versions.
@@ -102,47 +121,6 @@
   services.btrfs.autoScrub = {
     enable = true;
     fileSystems = ["/mnt/rootfs" "/mnt/lucastrunk"];
-  };
-
-  services.samba = {
-    enable = true;
-    settings = {
-      global = {
-        security = "user";
-      };
-      trunk = {
-        path = "/mnt/lucastrunk";
-        browseable = "yes";
-        "read only" = "no";
-        "guest ok" = "no";
-      };
-    };
-  };
-
-  services.avahi = {
-    enable = true;
-    nssmdns4 = true;
-    allowInterfaces = ["enp4s0"];
-    publish = {
-      enable = true;
-      addresses = true;
-      # domain = true;
-      # hinfo = true;
-      # userServices = true;
-    };
-    extraServiceFiles = {
-      smb = ''
-        <?xml version="1.0" standalone='no'?><!--*-nxml-*-->
-        <!DOCTYPE service-group SYSTEM "avahi-service.dtd">
-        <service-group>
-          <name replace-wildcards="yes">%h</name>
-          <service>
-            <type>_smb._tcp</type>
-            <port>445</port>
-          </service>
-        </service-group>
-      '';
-    };
   };
 
   networking.wireguard.enable = true;

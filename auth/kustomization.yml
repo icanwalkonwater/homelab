@@ -13,6 +13,7 @@ resources:
   - namespace.yml
   - lldap
   - authelia
+  - networking.yml
 
 images:
   - name: lldap

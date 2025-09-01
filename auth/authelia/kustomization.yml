@@ -14,9 +14,8 @@ labels:
 namespace: auth
 resources:
   - deployment.yml
-  - service.yml
-  - ingress.yml
   - pv.yml
+  - service.yml
 
 configMapGenerator:
   - name: authelia-config

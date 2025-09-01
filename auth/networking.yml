@@ -1,0 +1,73 @@
+--- # Authelia
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: authelia
+  annotations:
+    nginx.ingress.kubernetes.io/enable-cors: 'true'
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: identifie.mon.enorme.uk
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service: { name: authelia, port: { name: http } }
+  tls:
+  # use default certificate
+    - hosts:
+        - '*.mon.enorme.uk'
+
+--- # Policies
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default
+spec:
+  # This applies to all pods in the namespace
+  podSelector: {}
+  policyTypes: [Ingress, Egress]
+  ingress:
+    # Allow prometheus to scrape
+    - from:
+        - namespaceSelector: { matchLabels: { kubernetes.io/metadata.name: monitoring } }
+          podSelector: { matchLabels: { app.kubernetes.io/component: scrapper } }
+      ports: [{ port: metrics }]
+    # Allow nginx to serve http ports
+    - from:
+        - namespaceSelector: { matchLabels: { kubernetes.io/metadata.name: ingress-nginx } }
+          podSelector: { matchLabels: { app.kubernetes.io/name: ingress-nginx } }
+      ports: [{ port: http }]
+  egress:
+    # Allow DNS
+    - to:
+        - namespaceSelector: { matchLabels: { kubernetes.io/metadata.name: kube-system } }
+          podSelector: { matchLabels: { k8s-app: kube-dns } }
+      ports: [{ port: 53 }, { port: 53, protocol: UDP }]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-ldap-ingress
+spec:
+  podSelector: { matchLabels: { app.kubernetes.io/component: ldap } }
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - podSelector: { matchLabels: { app.kubernetes.io/component: oauth } }
+        - namespaceSelector: { matchLabels: { kubernetes.io/metadata.name: jellyfin } }
+          podSelector: { matchLabels: { app.kubernetes.io/component: jellyfin } }
+      ports: [{ port: ldap }]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-oauth-ldap-intra
+spec:
+  podSelector: { matchLabels: { app.kubernetes.io/component: oauth } }
+  policyTypes: [Egress]
+  egress:
+    - to: [podSelector: { matchLabels: { app.kubernetes.io/component: ldap } }]
+      ports: [{ port: ldap }]

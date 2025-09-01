@@ -14,8 +14,8 @@ labels:
 namespace: auth
 resources:
   - deployment.yml
-  - service.yml
   - pv.yml
+  - service.yml
 
 secretGenerator:
   - name: lldap-credentials

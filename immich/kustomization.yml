@@ -21,16 +21,16 @@ resources:
 images:
   - name: immich-server
     newName: ghcr.io/immich-app/immich-server
-    newTag: v1.139.2
+    newTag: v1.142.0
   - name: immich-machine-learning
     newName: ghcr.io/immich-app/immich-machine-learning
-    newTag: v1.139.2
+    newTag: v1.142.0
   - name: redis
     newName: docker.io/valkey/valkey
-    newTag: 8-bookworm@sha256:a137a2b60aca1a75130022d6bb96af423fefae4eb55faf395732db3544803280
+    newTag: 8-bookworm@sha256:fea8b3e67b15729d4bb70589eb03367bab9ad1ee89c876f54327fc7c6e618571
   - name: postgres
     newName: ghcr.io/immich-app/postgres
-    newTag: 14-vectorchord0.4.3-pgvectors0.2.0@sha256:32324a2f41df5de9efe1af166b7008c3f55646f8d0e00d9550c16c9822366b4a
+    newTag: 14-vectorchord0.4.3-pgvectors0.2.0@sha256:8d292bdb796aa58bbbaa47fe971c8516f6f57d6a47e7172e62754feb6ed4e7b0
 
 configMapGenerator:
   - name: immich-server-config

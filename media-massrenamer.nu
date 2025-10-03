@@ -108,7 +108,7 @@ def "main season" [
 
   print ($items
     | where {$in.filename != $in.target_file_name}
-    | each {$"(if $mv { 'mv' } else { 'ln' }) \"($in.filename | str replace '"' '\"')\" '($in.target_file_name)'"} | str join "\n"
+    | each {$"(if $mv { 'mv' } else { 'ln' }) '($in.filename | str replace "\'" "'\\''")' '($in.target_file_name)'"} | str join "\n"
   )
 }
 

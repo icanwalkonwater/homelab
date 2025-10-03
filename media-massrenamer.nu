@@ -320,7 +320,8 @@ def parse-ep [season: int, --offset-ep: int = 0]: string -> string {
         | path basename
         | parse --regex '[^a-zA-Z][eE](?<e>\d{1,2})[^0-9]'
         | get -o 0.e
-        | default {$file | path basename | parse --regex '(?:[^0-9](?<e>\d{2})[^0-9])' | get 0.e}
+        | default {$file | path basename | parse --regex '(?:[^0-9](?<e>\d{2})[^0-9])' | get -o 0.e}
+        | default {$file | path basename | parse --regex '(?<e>[0-9]{2})[^0-9]' | get 0.e}
 
       { s: $season, e: $fallback_e }
     }

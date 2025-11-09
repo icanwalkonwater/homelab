@@ -21,4 +21,4 @@ images:
     newTag: 2025-10-14-alpine-rootless
   - name: authelia
     newName: ghcr.io/authelia/authelia
-    newTag: 4.39.6
+    newTag: 4.39.14

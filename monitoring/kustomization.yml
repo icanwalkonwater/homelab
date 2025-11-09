@@ -27,4 +27,4 @@ images:
     newTag: v3.7.3
   - name: node-exporter
     newName: docker.io/prom/node-exporter
-    newTag: v1.9.1
+    newTag: v1.10.2

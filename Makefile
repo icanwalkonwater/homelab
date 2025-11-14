@@ -15,9 +15,11 @@ up:
 	kubectl apply -k jellyfin
 	kubectl apply -k paperless
 	kubectl apply -k immich
+	kubectl apply -k silverbullet
 
 .PHONY: down
 down:
+	kubectl delete -k silverbullet
 	kubectl delete -k immich
 	kubectl delete -k paperless
 	kubectl delete -k jellyfin

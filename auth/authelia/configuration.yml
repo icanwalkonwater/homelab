@@ -55,6 +55,9 @@ access_control:
   rules:
     - domain: identifie.mon.enorme.uk
       policy: one_factor
+    - domain: documente.mon.enorme.uk
+      policy: one_factor
+      subject: ['user:lucas']
 
 identity_providers:
   oidc:
